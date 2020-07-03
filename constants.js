@@ -9,3 +9,5 @@ export const SIGNED_KEY = process.env.SIGNED_KEY;
 export const SIGNED_CERT = process.env.SIGNED_CERT;
 export const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 export const ENVIRONMENT = process.env.ENVIRONMENT;
+export const DB_URL = process.env.DB_URL;
+export const SERVICE_ACCOUNT = process.env.SERVICE_ACCOUNT;

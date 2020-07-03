@@ -6,14 +6,14 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js "
+    "start": "GOOGLE_APPLICATION_CREDENTIALS=$PWD/firebase_servacc.json node index.js "
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dayjs": "^1.8.28",
     "dotenv": "^8.2.0",
-    "firebase-admin": "^8.12.1",
+    "firebase-admin": "^8.13.0",
     "node-schedule": "^1.3.2",
     "node-telegram-bot-api": "^0.50.0",
     "tgfancy": "^0.13.0"

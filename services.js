@@ -1,9 +1,12 @@
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
-import { FAIL_RATE, TO_WINDOW, FROM_WINDOW } from './config.js';
+import { FAIL_RATE, TO_WINDOW, FROM_WINDOW } from './constants.js';
 import { MESSAGES, NO_HUNT_IN_GAME } from './textmentions.js';
 import dayjs from 'dayjs';
 import Tgfancy from 'tgfancy';
+import { kill } from './dal/increment.js';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 /**
  * @type {Tgfancy}
@@ -101,6 +104,7 @@ export const doAction = async (msg, actionType) => {
     }
 
     if (isSuccessAction()) {
+        console.log(await kill(msg.from.id, msg.chat.id));
         scheduleNextDuck(msg);
         const difference = dayjs().diff(duckTimerStorage[msg.chat.id], 's', true);
         return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds.`);
@@ -108,3 +112,6 @@ export const doAction = async (msg, actionType) => {
         return sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again.`);
     }
 };
+
+// @ts-ignore
+export const __dirname = dirname(fileURLToPath(import.meta.url));
