@@ -19,8 +19,8 @@ import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEB
         if (ENVIRONMENT === 'production') {
             botConfig.webHook = {
                 port: WEBHOOK_PORT,
-                key: SIGNED_KEY,
-                cert: SIGNED_CERT
+                key: `${__dirname}/${SIGNED_KEY}`,
+                cert: `${__dirname}/${SIGNED_CERT}`
             };
         }
         // @ts-ignore
@@ -29,7 +29,7 @@ import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEB
 
         if (ENVIRONMENT === 'production') {
             await bot.setWebHook(`${WEBHOOK_URL}:${WEBHOOK_PORT}/bot${t}`, {
-                certificate: SIGNED_CERT
+                certificate: `${__dirname}/SIGNED_CERT`
             });
         } else {
             await bot.setWebHook(`${WEBHOOK_URL}/bot${t}`);
