@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
-export const FAIL_RATE = parseInt(process.env.FAIL_RATE || '0', 10);
+export const FAIL_RATE = parseFloat(process.env.FAIL_RATE || '0');
 export const FROM_WINDOW = parseInt(process.env.FROM_WINDOW || '0', 10); // in seconds
 export const TO_WINDOW = parseInt(process.env.TO_WINDOW || '0', 10); // in secons
 export const WEBHOOK_PORT = process.env.WEBHOOK_PORT;
