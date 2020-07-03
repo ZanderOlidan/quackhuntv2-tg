@@ -3,8 +3,10 @@ import { setBot, sendMsg, hasHunt, setHasHunt, scheduleNextDuck, doAction } from
 import { START_HUNT, BEF, BANG } from './textmentions.js';
 import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEBHOOK_URL } from './config.js';
 import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const __dirname = dirname;
+// @ts-ignore
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 (async () => {
     try {
