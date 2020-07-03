@@ -4,12 +4,18 @@
         "node": true
     },
     "extends": [
-        "standard"
+        "standard",
+        "eslint:recommended"
+    ],
+    "plugins": [
+        "jsdoc"
     ],
     "parserOptions": {
         "ecmaVersion": 11,
         "sourceType": "module"
     },
     "rules": {
+        "indent": ["error", 4],
+        "semi": ["error", "always"]
     }
 }
