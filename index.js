@@ -1,7 +1,7 @@
 import Tgfancy from 'tgfancy';
+import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEBHOOK_URL } from './config.js';
 import { setBot, sendMsg, hasHunt, setHasHunt, scheduleNextDuck, doAction } from './services.js';
 import { START_HUNT, BEF, BANG } from './textmentions.js';
-import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEBHOOK_URL } from './config.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,7 +11,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 (async () => {
     try {
         const t = TELEGRAM_TOKEN;
-        console.log(t);
         const botConfig = {
             tgfancy: {
                 orderedSending: true,
@@ -41,7 +40,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         }
 
         bot.onText(/\/starthunt/, async (msg) => {
-            console.log(msg.chat.id);
             await bot.sendMessage(msg.chat.id, START_HUNT);
             setHasHunt(true);
             scheduleNextDuck(msg);

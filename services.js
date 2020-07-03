@@ -60,6 +60,7 @@ export const scheduleNextDuck = async (msg) => {
     const rangeTo = dayjs().add(TO_WINDOW, 's').unix();
     const randomNumber = Math.floor(Math.random() * (rangeTo - rangeFrom) + rangeFrom);
     const d = dayjs.unix(randomNumber).toDate();
+    console.log('next', d);
     setDuckOut(msg, false);
     Schedule.scheduleJob(d, async () => {
         if (hasHunt) {
@@ -81,7 +82,7 @@ export const generateFailMessage = (list) => {
 
 const isSuccessAction = () => {
     const rand = Math.random();
-    console.log(rand, rand > FAIL_RATE);
+    console.log(rand, FAIL_RATE, rand > FAIL_RATE);
     return rand > FAIL_RATE;
 };
 
