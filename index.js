@@ -2,7 +2,8 @@ import Tgfancy from 'tgfancy';
 import { setBot, sendMsg, hasHunt, setHasHunt, scheduleNextDuck, doAction } from './services.js';
 import { START_HUNT, BEF, BANG } from './textmentions.js';
 import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEBHOOK_URL } from './config.js';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 (async () => {
     try {
