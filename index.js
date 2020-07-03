@@ -34,13 +34,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
         if (ENVIRONMENT === 'production') {
             await bot.setWebHook(`${WEBHOOK_URL}:${WEBHOOK_PORT}/bot${t}`, {
-                certificate: `${__dirname}/SIGNED_CERT`
+                certificate: `${__dirname}/${SIGNED_CERT}`
             });
         } else {
             await bot.setWebHook(`${WEBHOOK_URL}/bot${t}`);
         }
 
         bot.onText(/\/starthunt/, async (msg) => {
+            console.log(msg.chat.id);
             await bot.sendMessage(msg.chat.id, START_HUNT);
             setHasHunt(true);
             scheduleNextDuck(msg);
