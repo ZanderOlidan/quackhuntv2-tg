@@ -56,8 +56,8 @@ export const sendMsg = async (msg, messageContent) => {
 };
 
 export const scheduleNextDuck = async (msg) => {
-    const rangeFrom = dayjs().add(FROM_WINDOW, 'm').unix();
-    const rangeTo = dayjs().add(TO_WINDOW, 'm').unix();
+    const rangeFrom = dayjs().add(FROM_WINDOW, 's').unix();
+    const rangeTo = dayjs().add(TO_WINDOW, 's').unix();
     const randomNumber = Math.floor(Math.random() * (rangeTo - rangeFrom) + rangeFrom);
     const d = dayjs.unix(randomNumber).toDate();
     setDuckOut(msg, false);
