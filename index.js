@@ -1,13 +1,13 @@
 import Tgfancy from 'tgfancy';
 import { setBot, sendMsg, hasHunt, setHasHunt, scheduleNextDuck, doAction } from './services.js';
 import { START_HUNT, BEF, BANG } from './textmentions.js';
-import { WEBHOOK_URL, TELEGRAM_TOKEN, WEBHOOK_PORT } from './config.js';
+import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEBHOOK_URL } from './config.js';
 require('dotenv').config();
 
 (async () => {
     try {
         const t = TELEGRAM_TOKEN;
-        const bot = new Tgfancy(t, {
+        const botConfig = {
             tgfancy: {
                 orderedSending: true,
                 ratelimiting: true
@@ -15,10 +15,25 @@ require('dotenv').config();
             webHook: {
                 port: WEBHOOK_PORT
             }
-        });
+        };
+        if (ENVIRONMENT === 'production') {
+            botConfig.webHook = {
+                port: WEBHOOK_PORT,
+                key: SIGNED_KEY,
+                cert: SIGNED_CERT
+            };
+        }
+        // @ts-ignore
+        const bot = new Tgfancy(t, botConfig);
         setBot(bot);
 
-        await bot.setWebHook(`${WEBHOOK_URL}/bot${t}`);
+        if (ENVIRONMENT === 'production') {
+            await bot.setWebHook(`${WEBHOOK_URL}:${WEBHOOK_PORT}/bot${t}`, {
+                certificate: SIGNED_CERT
+            });
+        } else {
+            await bot.setWebHook(`${WEBHOOK_URL}/bot${t}`);
+        }
 
         bot.onText(/\/starthunt/, async (msg) => {
             await bot.sendMessage(msg.chat.id, START_HUNT);
