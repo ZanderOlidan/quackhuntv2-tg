@@ -1,10 +1,10 @@
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
 import { FAIL_RATE, TO_WINDOW, FROM_WINDOW } from './constants.js';
-import { MESSAGES, NO_HUNT_IN_GAME } from './textmentions.js';
+import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, BANG, BEF } from './textmentions.js';
 import dayjs from 'dayjs';
 import Tgfancy from 'tgfancy';
-import { kill } from './dal/increment.js';
+import { kill, incrementTypeDal } from './dal/increment.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -95,6 +95,18 @@ const isSuccessAction = () => {
  * @param {string} actionType
  */
 export const doAction = async (msg, actionType) => {
+    const MESSAGES = {
+        BANG: {
+            SUCCESS: BANG_SUCCESS,
+            NONEXISTENT: BANG_NONEXISTENT,
+            FAIL_MESSAGE: () => generateFailMessage(BANG_FAIL_MESSAGES),
+        },
+        BEF: {
+            SUCCESS: BEF_SUCCESS,
+            NONEXISTENT: BEF_NONEXISTENT,
+            FAIL_MESSAGE: () => generateFailMessage(BEF_FAIL_MESSAGES),
+        }
+    };
     if (!hasHunt) {
         return sendMsg(msg, NO_HUNT_IN_GAME);
     }
@@ -104,9 +116,11 @@ export const doAction = async (msg, actionType) => {
     }
 
     if (isSuccessAction()) {
-        console.log(await kill(msg.from.id, msg.chat.id));
+        // console.log(await kill(msg.from.id, msg.chat.id));
         scheduleNextDuck(msg);
         const difference = dayjs().diff(duckTimerStorage[msg.chat.id], 's', true);
+
+        await incrementTypeDal(msg, actionType);
         return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds.`);
     } else {
         return sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again.`);
