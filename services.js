@@ -51,7 +51,6 @@ export const setHasHunt = isHunting => {
  * @param {string} messageContent
  */
 export const sendMsg = async (msg, messageContent) => {
-    console.log(msg.from);
     const name = msg.from.first_name || msg.from.username;
     const content = `(<a href="tg://user?id=${msg.from.id}">${name}</a>) ${messageContent}`;
 
@@ -85,7 +84,6 @@ export const generateFailMessage = (list) => {
 
 const isSuccessAction = () => {
     const rand = Math.random();
-    console.log(rand, FAIL_RATE, rand > FAIL_RATE);
     return rand > FAIL_RATE;
 };
 

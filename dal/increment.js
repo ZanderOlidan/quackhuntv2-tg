@@ -49,5 +49,5 @@ export const incrementTypeDal = async (ctx, actionType) => {
     const group = DB.collection(`groups/${ctx.chat.id}/users`).doc(`${ctx.from.id}`);
     await group.set(content, { merge: true });
     const g = await group.get();
-    return g.data;
+    return g.data();
 };
