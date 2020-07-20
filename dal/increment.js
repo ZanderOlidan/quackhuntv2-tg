@@ -1,5 +1,5 @@
 import { DB, INCREMENT_ONE } from './index.js';
-import { BANG } from '../textmentions.js';
+import * as TgApi from 'node-telegram-bot-api';
 
 export const kill = async (ctx) => {
     const userContent = {
@@ -31,6 +31,11 @@ export const reject = async (ctx) => {
     return g.data;
 };
 
+/**
+ *
+ * @param {TgApi.Message} ctx
+ * @param {"BANG" | "BEF" | "REJECT"} actionType
+ */
 export const incrementTypeDal = async (ctx, actionType) => {
     const key = {
         BANG: 'kills',
@@ -41,7 +46,6 @@ export const incrementTypeDal = async (ctx, actionType) => {
     const content = {
         [key[actionType]]: INCREMENT_ONE
     };
-    // const group = DB.collection(`users/${ctx.from.id}/groups`).doc(`${ctx.chat.id}`);
     const group = DB.collection(`groups/${ctx.chat.id}/users`).doc(`${ctx.from.id}`);
     await group.set(content, { merge: true });
     const g = await group.get();

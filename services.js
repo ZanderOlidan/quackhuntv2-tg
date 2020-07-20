@@ -92,7 +92,7 @@ const isSuccessAction = () => {
 /**
  *
  * @param {TgApi.Message} msg
- * @param {string} actionType
+ * @param {"BANG" | "BEF" | "REJECT"} actionType
  */
 export const doAction = async (msg, actionType) => {
     const MESSAGES = {
@@ -116,13 +116,17 @@ export const doAction = async (msg, actionType) => {
     }
 
     if (isSuccessAction()) {
-        // console.log(await kill(msg.from.id, msg.chat.id));
         scheduleNextDuck(msg);
         const difference = dayjs().diff(duckTimerStorage[msg.chat.id], 's', true);
 
-        await incrementTypeDal(msg, actionType);
-        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds.`);
+        const newVal = await incrementTypeDal(msg, actionType);
+        const term = {
+            BANG: 'killed',
+            BEF: 'befriended'
+        };
+        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds. You have ${term[actionType]} ${newVal} ducks.`);
     } else {
+        await incrementTypeDal(msg, 'REJECT');
         return sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again.`);
     }
 };

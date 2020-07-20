@@ -37,7 +37,6 @@ import { START_HUNT, BEF, BANG } from './textmentions.js';
         }
 
         bot.onText(/\/starthunt/, async (msg) => {
-            console.log('chat_id', msg.chat.id);
             await bot.sendMessage(msg.chat.id, START_HUNT);
             setHasHunt(true);
             scheduleNextDuck(msg);
