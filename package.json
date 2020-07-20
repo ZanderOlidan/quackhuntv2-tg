@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "GOOGLE_APPLICATION_CREDENTIALS=$PWD/firebase_servacc.json node index.js "
+    "start": "GOOGLE_APPLICATION_CREDENTIALS=$PWD/firebase_servacc.json node index.js ",
+    "start:prod": "GOOGLE_APPLICATION_CREDENTIALS=$PWD/firebase_servacc.json pm2 start index.js"
   },
   "author": "",
   "license": "ISC",
