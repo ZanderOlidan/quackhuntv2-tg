@@ -118,6 +118,7 @@ export const doAction = async (msg, actionType) => {
         const difference = dayjs().diff(duckTimerStorage[msg.chat.id], 's', true);
 
         const newVal = await incrementTypeDal(msg, actionType);
+        console.log(newVal);
         const term = {
             BANG: 'killed',
             BEF: 'befriended'
