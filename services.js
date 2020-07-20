@@ -120,10 +120,16 @@ export const doAction = async (msg, actionType) => {
         const newVal = await incrementTypeDal(msg, actionType);
         console.log(newVal);
         const term = {
-            BANG: 'killed',
-            BEF: 'befriended'
+            BANG: {
+                term: 'killed',
+                dbField: 'kills'
+            },
+            BEF: {
+                term: 'befriended',
+                dbField: 'friends'
+            }
         };
-        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds. You have ${term[actionType]} ${newVal} ducks.`);
+        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`);
     } else {
         await incrementTypeDal(msg, 'REJECT');
         return sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again.`);
