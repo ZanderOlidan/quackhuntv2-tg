@@ -1,8 +1,9 @@
 import Tgfancy from 'tgfancy';
 import { init as dbInit } from './dal/index.js';
 import { TELEGRAM_TOKEN, WEBHOOK_PORT, SIGNED_KEY, SIGNED_CERT, ENVIRONMENT, WEBHOOK_URL } from './constants.js';
-import { setBot, sendMsg, hasHunt, setHasHunt, scheduleNextDuck, doAction, __dirname } from './services.js';
-import { START_HUNT, BEF, BANG } from './textmentions.js';
+import { setBot, doAction, __dirname, startHunt, stopHunt } from './services.js';
+import { BEF, BANG } from './textmentions.js';
+import { BootstrapServices } from './bootstrapServices.js';
 
 (async () => {
     try {
@@ -36,25 +37,22 @@ import { START_HUNT, BEF, BANG } from './textmentions.js';
             await bot.setWebHook(`${WEBHOOK_URL}/bot${t}`);
         }
 
-        bot.onText(/\/starthunt/, async (msg) => {
-            await bot.sendMessage(msg.chat.id, START_HUNT);
-            setHasHunt(true);
-            scheduleNextDuck(msg);
+        await BootstrapServices.initializeJobs();
+
+        bot.onText(/(\.|\/)starthunt/, async (msg) => {
+            await startHunt(msg);
         });
 
-        bot.onText(/\/bang/, async msg => {
+        bot.onText(/(\.|\/)bang/, async msg => {
             await doAction(msg, BANG);
         });
 
-        bot.onText(/\/bef/, async msg => {
+        bot.onText(/(\.|\/)bef/, async msg => {
             await doAction(msg, BEF);
         });
 
-        bot.onText(/\/stophunt/, async msg => {
-            if (hasHunt) {
-                setHasHunt(false);
-                await sendMsg(msg, 'Hunt over. Start again with /starthunt');
-            }
+        bot.onText(/(\.|\/)stophunt/, async msg => {
+            await stopHunt(msg);
         });
     } catch (e) {
         console.log(e);

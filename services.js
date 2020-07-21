@@ -1,18 +1,22 @@
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
-import { FAIL_RATE, TO_WINDOW, FROM_WINDOW } from './constants.js';
-import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, BANG, BEF } from './textmentions.js';
+import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN } from './constants.js';
+import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, BANG, BEF, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES } from './textmentions.js';
 import dayjs from 'dayjs';
 import Tgfancy from 'tgfancy';
-import { kill, incrementTypeDal } from './dal/increment.js';
+import { incrementTypeDal } from './dal/increment.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { RunningHuntsRepository } from './dal/runninghunts.js';
+import { State } from './memoryState.js';
+import utc from 'dayjs/plugin/utc.js';
+import { group } from 'console';
 
+dayjs.extend(utc);
 /**
  * @type {Tgfancy}
  */
 let BOT;
-export let hasHunt = false;
 
 /**
  * @param {Tgfancy} b
@@ -21,16 +25,13 @@ export const setBot = (b) => {
     BOT = b;
 };
 
-const duckTimerStorage = {};
-const chatHasDuckOut = {};
-
 /**
  *
  * @param {TgApi.Message} msg
  * @param {boolean} isOut
  */
 export const setDuckOut = (msg, isOut) => {
-    chatHasDuckOut[msg.chat.id] = isOut;
+    State.chatHasDuckOut[msg.chat.id] = isOut;
 };
 
 /**
@@ -38,11 +39,20 @@ export const setDuckOut = (msg, isOut) => {
  * @param {TgApi.Message} msg
  */
 export const isDuckOut = (msg) => {
-    return !!chatHasDuckOut[msg.chat.id];
+    return !!State.chatHasDuckOut[msg.chat.id];
 };
 
-export const setHasHunt = isHunting => {
-    hasHunt = isHunting;
+/**
+ *
+ * @param {TgApi.Message} ctx
+ * @param {boolean} isHunting
+ */
+export const setHasHunt = (ctx, isHunting) => {
+    State.chatHasHunt[ctx.chat.id] = isHunting;
+};
+
+export const hasHunt = (ctx) => {
+    return State.chatHasHunt[ctx.chat.id];
 };
 
 /**
@@ -57,18 +67,37 @@ export const sendMsg = async (msg, messageContent) => {
     await BOT.sendMessage(msg.chat.id, content, { parse_mode: 'HTML' });
 };
 
+/**
+ * 
+ * @param {TgApi.Message} msg 
+ */
 export const scheduleNextDuck = async (msg) => {
     const rangeFrom = dayjs().add(FROM_WINDOW, 's').unix();
     const rangeTo = dayjs().add(TO_WINDOW, 's').unix();
     const randomNumber = Math.floor(Math.random() * (rangeTo - rangeFrom) + rangeFrom);
-    const d = dayjs.unix(randomNumber).toDate();
-    console.log('next', d);
+
+    const d = dayjs.unix(randomNumber);
+
+    console.log(msg.chat.username, 'next', d.toISOString());
+
     setDuckOut(msg, false);
-    Schedule.scheduleJob(d, async () => {
-        if (hasHunt) {
-            duckTimerStorage[msg.chat.id] = dayjs().toISOString();
-            await BOT.sendMessage(msg.chat.id, '・゜゜・。🦆QUACK!・゜゜・。');
-            setDuckOut(msg, true);
+    await RunningHuntsRepository.setNextDuck(msg, d.toISOString());
+
+    await scheduleDuckJob(`${msg.chat.id}`, d.toDate());
+};
+
+/**
+ *
+ * @param {string} chatId
+ * @param {Date} date
+ */
+export const scheduleDuckJob = async (chatId, date) => {
+    State.jobschedules[chatId] = Schedule.scheduleJob(date, async () => {
+        console.log('running', chatId);
+        if (State.chatHasHunt[chatId]) {
+            State.duckTimerStorage[chatId] = dayjs().toISOString();
+            await BOT.sendMessage(chatId, '・゜゜・。🦆QUACK!・゜゜・。');
+            State.chatHasDuckOut[chatId] = true;
         }
     });
 };
@@ -77,7 +106,7 @@ export const scheduleNextDuck = async (msg) => {
  *
  * @param {string[]} list
  */
-export const generateFailMessage = (list) => {
+export const generateMessage = (list) => {
     const index = Math.floor(Math.random() * list.length);
     return list[index];
 };
@@ -85,6 +114,16 @@ export const generateFailMessage = (list) => {
 const isSuccessAction = () => {
     const rand = Math.random();
     return rand > FAIL_RATE;
+};
+
+const isInCooldown = (msg) => {
+    const userCd = State.userCooldown[msg.from.id];
+    if (userCd) {
+        if (dayjs(userCd).isAfter(dayjs())) {
+            return dayjs(userCd).diff(dayjs(), 's', true);
+        }
+    }
+    return false;
 };
 
 /**
@@ -95,27 +134,33 @@ const isSuccessAction = () => {
 export const doAction = async (msg, actionType) => {
     const MESSAGES = {
         BANG: {
-            SUCCESS: BANG_SUCCESS,
-            NONEXISTENT: BANG_NONEXISTENT,
-            FAIL_MESSAGE: () => generateFailMessage(BANG_FAIL_MESSAGES),
+            SUCCESS: () => generateMessage(BANG_SUCCESS),
+            NONEXISTENT: () => generateMessage(BANG_NONEXISTENT),
+            FAIL_MESSAGE: () => generateMessage(BANG_FAIL_MESSAGES)
         },
         BEF: {
-            SUCCESS: BEF_SUCCESS,
-            NONEXISTENT: BEF_NONEXISTENT,
-            FAIL_MESSAGE: () => generateFailMessage(BEF_FAIL_MESSAGES),
+            SUCCESS: () => generateMessage(BEF_SUCCESS),
+            NONEXISTENT: () => generateMessage(BEF_NONEXISTENT),
+            FAIL_MESSAGE: () => generateMessage(BEF_FAIL_MESSAGES)
         }
     };
-    if (!hasHunt) {
+
+    if (!hasHunt(msg)) {
         return sendMsg(msg, NO_HUNT_IN_GAME);
     }
 
     if (!isDuckOut(msg)) {
-        return sendMsg(msg, MESSAGES[actionType].NONEXISTENT);
+        return sendMsg(msg, MESSAGES[actionType].NONEXISTENT());
+    }
+
+    const inCd = isInCooldown(msg);
+    if (inCd) {
+        return sendMsg(msg, `${generateMessage(COOLDOWN_MESSAGES)} ${inCd} seconds`);
     }
 
     if (isSuccessAction()) {
         scheduleNextDuck(msg);
-        const difference = dayjs().diff(duckTimerStorage[msg.chat.id], 's', true);
+        const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id], 's', true);
 
         const newVal = await incrementTypeDal(msg, actionType);
         console.log(newVal);
@@ -129,11 +174,49 @@ export const doAction = async (msg, actionType) => {
                 dbField: 'friends'
             }
         };
-        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`);
+        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS()} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`);
     } else {
         await incrementTypeDal(msg, 'REJECT');
-        return sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again.`);
+        State.userCooldown[msg.from.id] = dayjs().add(USER_MESSAGE_COOLDOWN, 's');
+        return await sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again in ${USER_MESSAGE_COOLDOWN} seconds`);
     }
+};
+
+/**
+ *
+ * @param {TgApi.Message} msg
+ */
+export const startHunt = async (msg, isManualStart = true) => {
+    if (!hasHunt(msg)) {
+        if (isManualStart) {
+            await BOT.sendMessage(msg.chat.id, START_HUNT);
+        }
+        setHasHunt(msg, true);
+        // add hunt
+        scheduleNextDuck(msg);
+    } else {
+        if (isManualStart) {
+            await BOT.sendMessage(msg.chat.id, HUNT_STARTED);
+        }
+    }
+};
+
+/**
+ *
+ * @param {TgApi.Message} msg
+ */
+export const stopHunt = async (msg) => {
+    if (hasHunt(msg)) {
+        setHasHunt(msg, false);
+        // delete from db
+        await RunningHuntsRepository.deleteGroup(msg);
+        // remove job from memory
+        const groupSchedule = State.jobschedules[msg.chat.id];
+        if (groupSchedule) {
+            groupSchedule.cancel();
+        }
+    }
+    await sendMsg(msg, 'Hunt over. Start again with /starthunt');
 };
 
 // @ts-ignore
