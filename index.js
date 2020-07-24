@@ -11,5 +11,5 @@ import { Stats } from './services/Stats.js';
     BOT.onText(/(\.|\/)bang/, async msg => doAction(msg, BANG));
     BOT.onText(/(\.|\/)bef/, async msg => doAction(msg, BEF));
     BOT.onText(/(\.|\/)stophunt/, async msg => stopHunt(msg));
-    BOT.onText(/(\.|\/)stats/, async msg => Stats.getUser(msg));
+    BOT.onText(/(\.|\/)duckstats/, async msg => Stats.getUser(msg));
 })();
