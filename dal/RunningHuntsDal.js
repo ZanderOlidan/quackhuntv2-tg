@@ -57,7 +57,7 @@ const isInLatestVersion = async (chatId, version) => {
         }
 
         if (group.data().version !== version) {
-            t.update(currentDoc(chatId), { version });
+            t.set(currentDoc(chatId), { version }, { merge: true });
             return false;
         }
 
