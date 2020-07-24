@@ -3,6 +3,8 @@ import { doAction, startHunt, stopHunt } from './services.js';
 import { BEF, BANG } from './textmentions.js';
 import { BOT, initializeBot } from './services/config.js';
 import { Stats } from './services/Stats.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 (async () => {
     try {

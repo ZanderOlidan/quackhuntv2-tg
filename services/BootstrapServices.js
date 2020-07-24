@@ -5,6 +5,7 @@ import { scheduleDuckJob, __dirname } from '../services.js';
 import utc from 'dayjs/plugin/utc.js';
 import { BOT } from './config.js';
 import * as fs from 'fs';
+import { VERSION } from '../constants.js';
 dayjs.extend(utc);
 
 /**
@@ -32,10 +33,10 @@ const initializeJobs = async () => {
 const showChangelog = async () => {
     const all = await RunningHuntsDal.getAll();
     await Promise.all(all.docs.map(async g => {
-        const isLatest = await RunningHuntsDal.isInLatestVersion(parseInt(g.id, 10), process.env.npm_package_version);
+        const isLatest = await RunningHuntsDal.isInLatestVersion(parseInt(g.id, 10), VERSION);
         if (!isLatest) {
             // open file
-            const path = `${__dirname}/changelogs/${process.env.npm_package_version}.html`;
+            const path = `${__dirname}/changelogs/${VERSION}.html`;
             const contents = await fs.promises.readFile(path, { encoding: 'utf-8' });
             await BOT.sendMessage(g.id, contents, { parse_mode: 'HTML' });
         }

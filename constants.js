@@ -12,3 +12,4 @@ export const ENVIRONMENT = process.env.ENVIRONMENT;
 export const DB_URL = process.env.DB_URL;
 export const SERVICE_ACCOUNT = process.env.SERVICE_ACCOUNT;
 export const USER_MESSAGE_COOLDOWN = parseInt(process.env.USER_MESSAGE_COOLDOWN || '5', 10);
+export const VERSION = process.env.VERSION;

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
-import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN } from './constants.js';
+import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN, VERSION } from './constants.js';
 import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES } from './textmentions.js';
 import dayjs from 'dayjs';
 import { BOT } from './services/config.js';
@@ -177,7 +177,7 @@ export const startHunt = async (msg, isManualStart = true) => {
         if (isManualStart) {
             await BOT.sendMessage(msg.chat.id, START_HUNT);
         }
-        await RunningHuntsDal.setVersion(msg, process.env.npm_package_version);
+        await RunningHuntsDal.setVersion(msg, VERSION);
         setHasHunt(msg, true);
         // add hunt
         scheduleNextDuck(msg);
