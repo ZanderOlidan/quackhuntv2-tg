@@ -1,4 +1,4 @@
-import { init as dbInit } from './dal/index.js';
+import { init as dbInit } from './dal/config.js';
 import { doAction, startHunt, stopHunt } from './services.js';
 import { BEF, BANG } from './textmentions.js';
 import { BOT, initializeBot } from './services/config.js';

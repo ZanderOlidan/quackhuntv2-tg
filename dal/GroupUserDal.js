@@ -4,16 +4,16 @@ import { INCREMENT_ONE, DB } from './config.js';
 import { GroupUserModel } from './models/GroupUserModel.js';
 import { GroupUserMapping } from './mappings/GroupUserMapping.js';
 
-const currentUser = ctx => DB.collection(`groups/${ctx.chat.id}/users`).doc(`${ctx.chat.id}`);
+const currentUser = ctx => DB.collection(`groups/${ctx.chat.id}/users`).doc(`${ctx.from.id}`);
+const ToModel = d => new GroupUserModel(d);
 
 /**
  *
  * @param {TgApi.Message} ctx
  */
 const getUserStat = async (ctx) => {
-    const user = currentUser(ctx);
-    const d = await user.get();
-    return new GroupUserModel(d.data());
+    const d = await currentUser(ctx).get();
+    return ToModel(d.data());
 };
 
 /**
@@ -34,7 +34,7 @@ const incrementType = async (ctx, actionType) => {
     const user = currentUser(ctx);
     await user.set(content, { merge: true });
     const u = await user.get();
-    return u.data();
+    return ToModel(u.data());
 };
 
 export const GroupUserDal = {

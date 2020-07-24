@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { BOT } from './services/config.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { RunningHuntsRepository } from './dal/runninghunts.js';
+import { RunningHuntsDal } from './dal/RunningHuntsDal.js';
 import { State } from './memoryState.js';
 import utc from 'dayjs/plugin/utc.js';
 import { GroupUserDal } from './dal/GroupUserDal.js';
@@ -66,10 +66,10 @@ export const scheduleNextDuck = async (msg) => {
 
     const d = dayjs.unix(randomNumber);
 
-    console.log(msg.chat.username, 'next', d.toISOString());
+    console.log(msg.chat.title, msg.chat.id, d.toISOString());
 
     setDuckOut(msg, false);
-    await RunningHuntsRepository.setNextDuck(msg, d.toISOString());
+    await RunningHuntsDal.setNextDuck(msg, d.toISOString());
 
     await scheduleDuckJob(`${msg.chat.id}`, d.toDate());
 };
@@ -81,7 +81,6 @@ export const scheduleNextDuck = async (msg) => {
  */
 export const scheduleDuckJob = async (chatId, date) => {
     State.jobschedules[chatId] = Schedule.scheduleJob(date, async () => {
-        console.log('running', chatId);
         if (State.chatHasHunt[chatId]) {
             State.duckTimerStorage[chatId] = dayjs().toISOString();
             await BOT.sendMessage(chatId, '・゜゜・。🦆QUACK!・゜゜・。');
@@ -151,7 +150,6 @@ export const doAction = async (msg, actionType) => {
         const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id], 's', true);
 
         const newVal = await GroupUserDal.incrementType(msg, actionType);
-        console.log(newVal);
         const term = {
             BANG: {
                 term: 'killed',
@@ -179,6 +177,7 @@ export const startHunt = async (msg, isManualStart = true) => {
         if (isManualStart) {
             await BOT.sendMessage(msg.chat.id, START_HUNT);
         }
+        await RunningHuntsDal.setVersion(msg, process.env.npm_package_version);
         setHasHunt(msg, true);
         // add hunt
         scheduleNextDuck(msg);
@@ -197,7 +196,7 @@ export const stopHunt = async (msg) => {
     if (hasHunt(msg)) {
         setHasHunt(msg, false);
         // delete from db
-        await RunningHuntsRepository.deleteGroup(msg);
+        await RunningHuntsDal.deleteGroup(msg);
         // remove job from memory
         const groupSchedule = State.jobschedules[msg.chat.id];
         if (groupSchedule) {

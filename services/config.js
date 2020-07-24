@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import Tgfancy from 'tgfancy';
-import { TELEGRAM_TOKEN, WEBHOOK_PORT, ENVIRONMENT, SIGNED_KEY, SIGNED_CERT, WEBHOOK_URL } from '../constants.js';
-import { BootstrapServices } from '../bootstrapServices.js';
+import { TELEGRAM_TOKEN, WEBHOOK_PORT, ENVIRONMENT, SIGNED_CERT, WEBHOOK_URL } from '../constants.js';
+import { BootstrapServices } from './BootstrapServices.js';
 
 /**
  * @type {Tgfancy}
@@ -29,21 +29,23 @@ const initializeBot = async () => {
     if (ENVIRONMENT === 'production') {
         botConfig.webHook = {
             port: WEBHOOK_PORT,
-            key: `${__dirname}/${SIGNED_KEY}`,
-            cert: `${__dirname}/${SIGNED_CERT}`
+            host: '127.0.0.1'
+            // key: `${__dirname}/${SIGNED_KEY}`,
+            // cert: `${__dirname}/${SIGNED_CERT}`
         };
     }
     // @ts-ignore
     const bot = new Tgfancy(t, botConfig);
     setBot(bot);
     if (ENVIRONMENT === 'production') {
-        await BOT.setWebHook(`${WEBHOOK_URL}:${WEBHOOK_PORT}/bot${t}`, {
-            certificate: `${__dirname}/${SIGNED_CERT}`
+        await BOT.setWebHook(`${WEBHOOK_URL}:443/qrackhunt/bot${t}`, {
+            certificate: `${SIGNED_CERT}`
         });
-        await BootstrapServices.initializeJobs();
     } else {
-        await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`);
+        await BOT.setWebHook(`${WEBHOOK_URL}/quackquack/bot${t}`);
     }
+    await BootstrapServices.initializeJobs();
+    await BootstrapServices.showChangelog();
 };
 
 export {

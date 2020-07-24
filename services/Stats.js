@@ -17,7 +17,6 @@ const getUser = async (msg) => {
 <b>😵Banged: </b> ${data.kills} ${DUCKNAME.toLowerCase() + withS(data.kills)}
 <b>💖Friends: </b> ${data.friends} ${DUCKNAME.toLowerCase() + withS(data.friends)}
 <b>🙅‍♀️Rejections: </b> ${data.rejects} ${DUCKNAME.toLowerCase() + withS(data.rejects)}
-
     `;
 
     return BOT.sendMessage(msg.chat.id, content, { parse_mode: 'HTML' });
