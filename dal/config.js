@@ -8,7 +8,6 @@ import { __dirname } from '../services.js';
  */
 let DB;
 let INCREMENT_ONE;
-
 export const init = () => {
     readFile(`${__dirname}/${SERVICE_ACCOUNT}`, 'utf-8', (err, data) => {
         if (err) throw err;

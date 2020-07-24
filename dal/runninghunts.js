@@ -4,7 +4,7 @@ import * as TgApi from 'node-telegram-bot-api';
 const RunningHuntsCollection = 'runninghunts';
 
 /**
- * 
+ *
  * @param {TgApi.Message} ctx
  */
 const deleteGroup = async (ctx) => {

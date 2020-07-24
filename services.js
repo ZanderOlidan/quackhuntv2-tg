@@ -1,30 +1,18 @@
+// eslint-disable-next-line no-unused-vars
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
 import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN } from './constants.js';
-import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, BANG, BEF, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES } from './textmentions.js';
+import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES } from './textmentions.js';
 import dayjs from 'dayjs';
-import Tgfancy from 'tgfancy';
-import { incrementTypeDal } from './dal/increment.js';
+import { BOT } from './services/config.js';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { RunningHuntsRepository } from './dal/runninghunts.js';
 import { State } from './memoryState.js';
 import utc from 'dayjs/plugin/utc.js';
-import { group } from 'console';
+import { GroupUserDal } from './dal/GroupUserDal.js';
 
 dayjs.extend(utc);
-/**
- * @type {Tgfancy}
- */
-let BOT;
-
-/**
- * @param {Tgfancy} b
- */
-export const setBot = (b) => {
-    BOT = b;
-};
-
 /**
  *
  * @param {TgApi.Message} msg
@@ -68,8 +56,8 @@ export const sendMsg = async (msg, messageContent) => {
 };
 
 /**
- * 
- * @param {TgApi.Message} msg 
+ *
+ * @param {TgApi.Message} msg
  */
 export const scheduleNextDuck = async (msg) => {
     const rangeFrom = dayjs().add(FROM_WINDOW, 's').unix();
@@ -162,7 +150,7 @@ export const doAction = async (msg, actionType) => {
         scheduleNextDuck(msg);
         const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id], 's', true);
 
-        const newVal = await incrementTypeDal(msg, actionType);
+        const newVal = await GroupUserDal.incrementType(msg, actionType);
         console.log(newVal);
         const term = {
             BANG: {
@@ -176,7 +164,7 @@ export const doAction = async (msg, actionType) => {
         };
         return sendMsg(msg, `${MESSAGES[actionType].SUCCESS()} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`);
     } else {
-        await incrementTypeDal(msg, 'REJECT');
+        await GroupUserDal.incrementType(msg, 'REJECT');
         State.userCooldown[msg.from.id] = dayjs().add(USER_MESSAGE_COOLDOWN, 's');
         return await sendMsg(msg, `${MESSAGES[actionType].FAIL_MESSAGE()} Try again in ${USER_MESSAGE_COOLDOWN} seconds`);
     }
