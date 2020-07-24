@@ -38,7 +38,7 @@ const initializeBot = async () => {
     const bot = new Tgfancy(t, botConfig);
     setBot(bot);
     if (ENVIRONMENT === 'production') {
-        await BOT.setWebHook(`${WEBHOOK_URL}:443/qrackhunt/bot${t}`, {
+        await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`, {
             certificate: `${SIGNED_CERT}`
         });
     } else {
