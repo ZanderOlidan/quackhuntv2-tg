@@ -8,6 +8,14 @@ const getGroups = async () => {
     return currentCollection().get();
 };
 
+/**
+ *
+ * @param {string} chatId
+ */
+// const getGroupStats = async (chatId) => {
+//     const get = await currentCollection().doc(chatId).get();
+// };
+
 export const GroupDal = {
     getGroups
 };

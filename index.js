@@ -3,6 +3,7 @@ import { doAction, startHunt, stopHunt } from './services.js';
 import { BEF, BANG } from './textmentions.js';
 import { BOT, initializeBot } from './services/config.js';
 import { Stats } from './services/Stats.js';
+import { Feedback } from './services/FeedbackService.js';
 
 (async () => {
     try {
@@ -15,8 +16,8 @@ import { Stats } from './services/Stats.js';
         BOT.onText(/(\.|\/)bef/, async msg => doAction(msg, BEF));
         BOT.onText(/(\.|\/)stophunt/, async msg => stopHunt(msg));
         BOT.onText(/(\.|\/)duckstats/, async msg => Stats.getUser(msg));
+        BOT.onText(/\/say (.+)/, Feedback.send);
     } catch (e) {
-        console.log(e);
-        throw e;
+        console.error(e);
     }
 })();

@@ -21,3 +21,8 @@ For Prod, setup your own webhook url. Create certs if you have to.
 - [ ] PAKAK GURL! Nakabingwit ka na naman ng patola in 18.534 seconds. You have befriended 6 patolas
 - [ ] Template strings
 - [ ] Custom Language
+
+## When changing something
+
+Dont' forget to add a new `changelog.html` file. Follow the html guidelines of telegram.
+Dont forget to add `.env` version that matches the version.

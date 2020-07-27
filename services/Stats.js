@@ -22,6 +22,10 @@ const getUser = async (msg) => {
     return BOT.sendMessage(msg.chat.id, content, { parse_mode: 'HTML' });
 };
 
+// const getGroupStats = async (msg) => {
+//     const data = await GroupDa
+// };
+
 export const Stats = {
     getUser
 };
