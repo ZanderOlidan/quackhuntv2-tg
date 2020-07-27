@@ -9,18 +9,22 @@ import { __dirname } from '../services.js';
 let DB;
 let INCREMENT_ONE;
 export const init = () => {
-    readFile(`${__dirname}/${SERVICE_ACCOUNT}`, 'utf-8', (err, data) => {
-        if (err) throw err;
+    try {
+        readFile(`${__dirname}/${SERVICE_ACCOUNT}`, 'utf-8', (err, data) => {
+            if (err) throw err;
 
-        const contents = JSON.parse(data);
-        admin.initializeApp({
-            credential: admin.credential.cert(contents),
-            databaseURL: DB_URL
+            const contents = JSON.parse(data);
+            admin.initializeApp({
+                credential: admin.credential.cert(contents),
+                databaseURL: DB_URL
+            });
+
+            DB = admin.firestore();
+            INCREMENT_ONE = admin.firestore.FieldValue.increment(1);
         });
-
-        DB = admin.firestore();
-        INCREMENT_ONE = admin.firestore.FieldValue.increment(1);
-    });
+    } catch (e) {
+        console.error(e);
+    }
 };
 
 export {

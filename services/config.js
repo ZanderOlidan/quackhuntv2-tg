@@ -45,7 +45,11 @@ const initializeBot = async () => {
         await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`);
         console.log('connected to', WEBHOOK_URL, 'port', WEBHOOK_PORT);
     }
-    await BootstrapServices.initializeJobs();
+    try {
+        await BootstrapServices.initializeJobs();
+    } catch (e) {
+        console.error(e);
+    }
     await BootstrapServices.showChangelog();
 };
 
