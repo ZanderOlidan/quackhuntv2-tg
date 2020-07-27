@@ -196,7 +196,7 @@ export const stopHunt = async (msg) => {
     if (hasHunt(msg)) {
         setHasHunt(msg, false);
         // delete from db
-        await RunningHuntsDal.deleteGroup(msg);
+        await RunningHuntsDal.deleteGroup(msg.chat.id);
         // remove job from memory
         const groupSchedule = State.jobschedules[msg.chat.id];
         if (groupSchedule) {

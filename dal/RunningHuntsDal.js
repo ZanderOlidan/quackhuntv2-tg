@@ -5,16 +5,16 @@ import * as TgApi from 'node-telegram-bot-api';
 const RunningHuntsCollection = 'runninghunts';
 const currentCollection = () => DB.collection(RunningHuntsCollection);
 /**
- * @param {number} chatId
+ * @param {number|string} chatId
  */
 const currentDoc = chatId => currentCollection().doc(`${chatId}`);
 
 /**
  *
- * @param {TgApi.Message} ctx
+ * @param {number|string} chatId
  */
-const deleteGroup = async (ctx) => {
-    await currentDoc(ctx.chat.id).delete();
+const deleteGroup = async (chatId) => {
+    await currentDoc(`${chatId}`).delete();
 };
 
 /**

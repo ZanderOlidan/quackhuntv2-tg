@@ -18,14 +18,10 @@ const initializeHuntWorker = async (chatId, date) => {
 
     const nextDuck = dayjs.utc(date);
     // check for hanging duck after the restart
-    try {
-        if (nextDuck.isBefore(dayjs())) {
-            await scheduleDuckJob(chatId, dayjs().add(2, 's').toDate());
-        } else {
-            await scheduleDuckJob(chatId, nextDuck.toDate());
-        }
-    } catch (e) {
-        console.error(e);
+    if (nextDuck.isBefore(dayjs())) {
+        await scheduleDuckJob(chatId, dayjs().add(2, 's').toDate());
+    } else {
+        await scheduleDuckJob(chatId, nextDuck.toDate());
     }
 };
 
@@ -42,7 +38,11 @@ const showChangelog = async () => {
             // open file
             const path = `${__dirname}/changelogs/${VERSION}.html`;
             const contents = await fs.promises.readFile(path, { encoding: 'utf-8' });
-            await BOT.sendMessage(g.id, contents, { parse_mode: 'HTML' });
+            try {
+                await BOT.sendMessage(g.id, contents, { parse_mode: 'HTML' });
+            } catch (e) {
+                await RunningHuntsDal.deleteGroup(g.id);
+            }
         }
     }));
 };
