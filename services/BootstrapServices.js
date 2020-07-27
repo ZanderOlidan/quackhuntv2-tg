@@ -18,10 +18,14 @@ const initializeHuntWorker = async (chatId, date) => {
 
     const nextDuck = dayjs.utc(date);
     // check for hanging duck after the restart
-    if (nextDuck.isBefore(dayjs())) {
-        await scheduleDuckJob(chatId, dayjs().add(2, 's').toDate());
-    } else {
-        await scheduleDuckJob(chatId, nextDuck.toDate());
+    try {
+        if (nextDuck.isBefore(dayjs())) {
+            await scheduleDuckJob(chatId, dayjs().add(2, 's').toDate());
+        } else {
+            await scheduleDuckJob(chatId, nextDuck.toDate());
+        }
+    } catch (e) {
+        console.error(e);
     }
 };
 
