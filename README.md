@@ -13,10 +13,11 @@ For Prod, setup your own webhook url. Create certs if you have to.
 
 ## TODO
 
+- [ ] Settings
 - [ ] Add inline buttons
 - [x] Stats
 - [x] Add cooldown
-- [ ] Decrement bang/bef count if no duck present
-- [ ] (name) PAKAK GURL! Nakabingwit ka na naman ng patola in 18.534 seconds. You have befriended 6 patolas
+- [ ] (OPTIONAL) Decrement bang/bef count if no duck present
+- [ ] PAKAK GURL! Nakabingwit ka na naman ng patola in 18.534 seconds. You have befriended 6 patolas
 - [ ] Template strings
 - [ ] Custom Language

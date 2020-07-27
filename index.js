@@ -5,11 +5,18 @@ import { BOT, initializeBot } from './services/config.js';
 import { Stats } from './services/Stats.js';
 
 (async () => {
-    dbInit();
-    await initializeBot();
-    BOT.onText(/(\.|\/)starthunt/, async (msg) => startHunt(msg));
-    BOT.onText(/(\.|\/)bang/, async msg => doAction(msg, BANG));
-    BOT.onText(/(\.|\/)bef/, async msg => doAction(msg, BEF));
-    BOT.onText(/(\.|\/)stophunt/, async msg => stopHunt(msg));
-    BOT.onText(/(\.|\/)duckstats/, async msg => Stats.getUser(msg));
+    try {
+        dbInit();
+        console.log('DB initialized');
+        await initializeBot();
+        console.log('bot initialized');
+        BOT.onText(/(\.|\/)starthunt/, async (msg) => startHunt(msg));
+        BOT.onText(/(\.|\/)bang/, async msg => doAction(msg, BANG));
+        BOT.onText(/(\.|\/)bef/, async msg => doAction(msg, BEF));
+        BOT.onText(/(\.|\/)stophunt/, async msg => stopHunt(msg));
+        BOT.onText(/(\.|\/)duckstats/, async msg => Stats.getUser(msg));
+    } catch (e) {
+        console.log(e);
+        throw e;
+    }
 })();

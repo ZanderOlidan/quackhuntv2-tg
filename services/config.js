@@ -42,7 +42,8 @@ const initializeBot = async () => {
             certificate: `${SIGNED_CERT}`
         });
     } else {
-        await BOT.setWebHook(`${WEBHOOK_URL}/quackquack/bot${t}`);
+        await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`);
+        console.log('connected to', WEBHOOK_URL, 'port', WEBHOOK_PORT);
     }
     await BootstrapServices.initializeJobs();
     await BootstrapServices.showChangelog();
