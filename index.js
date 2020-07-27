@@ -6,11 +6,12 @@ import { Stats } from './services/Stats.js';
 import { Feedback } from './services/FeedbackService.js';
 
 (async () => {
+    dbInit();
+    console.log('DB initialized');
+    await initializeBot();
+    console.log('bot initialized');
+
     try {
-        dbInit();
-        console.log('DB initialized');
-        await initializeBot();
-        console.log('bot initialized');
         BOT.onText(/(\.|\/)starthunt/, async (msg) => startHunt(msg));
         BOT.onText(/(\.|\/)bang/, async msg => doAction(msg, BANG));
         BOT.onText(/(\.|\/)bef/, async msg => doAction(msg, BEF));
