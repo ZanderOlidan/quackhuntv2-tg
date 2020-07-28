@@ -45,7 +45,6 @@ const initializeBot = async () => {
         await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`);
         console.log('connected to', WEBHOOK_URL, 'port', WEBHOOK_PORT);
     }
-    await BootstrapServices.showChangelog();
 };
 
 export {

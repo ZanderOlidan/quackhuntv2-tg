@@ -19,11 +19,13 @@ import { BootstrapServices } from './services/BootstrapServices.js';
         BOT.onText(/(\.|\/)stophunt/, async msg => stopHunt(msg));
         BOT.onText(/(\.|\/)duckstats/, async msg => Stats.getUser(msg));
         BOT.onText(/\/say (.+)/, Feedback.send);
+        BOT.onText(/\/reply (.+)/, Feedback.reply);
     } catch (e) {
         console.error(e);
     }
 
     try {
+        await BootstrapServices.showChangelog();
         await BootstrapServices.initializeJobs();
         console.log('initiliazed jobs');
     } catch (e) {

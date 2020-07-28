@@ -24,7 +24,8 @@ Pssst. Can't give feedback with an empty message like so
         const date = dayjs(dayjs.unix(msg.date)).toDate().toLocaleString('en-GB', { timeZone: 'Asia/Hong_Kong' });
         // send to dev
         await BOT.sendMessage(ownerId, `
-${date} - ${msg.from.first_name} ${msg.from.username || ''}
+${date} - ${msg.from.first_name} ${msg.from.username || ''} 
+${msg.chat.id} - ${msg.chat.title || ''}
 
 ${message}
 
@@ -35,6 +36,14 @@ ${message}
     }
 };
 
+const reply = async (msg, match) => {
+    const location = match[1].split(' ')[0];
+    const message = match[1].split(' ').slice(1).join('');
+
+    await BOT.sendMessage(location, message);
+};
+
 export const Feedback = {
-    send
+    send,
+    reply
 };
