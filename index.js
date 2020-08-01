@@ -1,5 +1,5 @@
 import { init as dbInit } from './dal/config.js';
-import { doAction, startHunt, stopHunt, escCb } from './services.js';
+import { doAction, startHunt, stopHunt, escCb, ownerOnly } from './services.js';
 import { BEF, BANG } from './textmentions.js';
 import { BOT, initializeBot } from './services/config.js';
 import { Stats } from './services/Stats.js';
@@ -22,8 +22,8 @@ import { Migrations } from './services/MigrationServices.js';
         BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
         BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
 
-        BOT.onText(/\/reply (.+)/, escCb(Feedback.reply));
-        BOT.onText(/\/migrategroupstats/, escCb(Migrations.migrateTotals));
+        BOT.onText(/\/reply (.+)/, ownerOnly(escCb(Feedback.reply)));
+        BOT.onText(/\/migrategroupstats/, ownerOnly(escCb(Migrations.migrateTotals)));
     } catch (e) {
         console.error(e);
     }

@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
-import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN, VERSION, FRIYAY } from './constants.js';
+import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN, VERSION, FRIYAY, OWNER_ID } from './constants.js';
 import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES, SELFHUNT } from './textmentions.js';
 import dayjs from 'dayjs';
 import { BOT } from './services/config.js';
@@ -100,13 +100,13 @@ export const scheduleDuckJob = async (chatId, date) => {
     State.jobschedules[chatId] = Schedule.scheduleJob(date, async () => {
         if (State.chatHasHunt[chatId]) {
             State.duckTimerStorage[chatId] = dayjs().toISOString();
+            State.chatHasDuckOut[chatId] = true;
             try {
                 await BOT.sendMessage(chatId, '・゜゜・。🦆QUACK!・゜゜・。');
             } catch (e) {
                 await Exceptions.handle403(e, chatId);
                 console.error(`Cannot schedule duck for ${chatId}`, e);
             }
-            State.chatHasDuckOut[chatId] = true;
         }
     });
 };
@@ -250,4 +250,11 @@ export const escCb = (cb) => (...msg) => {
     msg[0].text = escapeText(msg[0].text);
     // eslint-disable-next-line standard/no-callback-literal
     return cb(...msg);
+};
+
+export const ownerOnly = (cb) => (...msg) => {
+    if (msg[0].from.id === OWNER_ID) {
+        // eslint-disable-next-line standard/no-callback-literal
+        cb(...msg);
+    }
 };
