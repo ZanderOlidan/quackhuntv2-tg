@@ -100,7 +100,7 @@ export const scheduleDuckJob = async (chatId, date) => {
                 await BOT.sendMessage(chatId, '・゜゜・。🦆QUACK!・゜゜・。');
             } catch (e) {
                 await Exceptions.handle403(e, chatId);
-                console.log(`Cannot schedule duck for ${chatId}`, e);
+                console.error(`Cannot schedule duck for ${chatId}`, e);
             }
             State.chatHasDuckOut[chatId] = true;
         }
