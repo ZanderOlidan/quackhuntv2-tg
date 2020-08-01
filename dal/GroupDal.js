@@ -2,9 +2,10 @@
 import * as TgApi from 'node-telegram-bot-api';
 import { DB } from './config.js';
 import { GroupStatsModel } from './models/GroupStatsModel.js';
+import { GroupModel } from './models/GroupModel.js';
 
 const currentCollection = () => DB.collection('groups');
-// const ToModel = d => new GroupModel(d);
+const ToModel = d => new GroupModel(d);
 
 const getGroups = async () => {
     return currentCollection().get();
@@ -36,11 +37,13 @@ const getGroupStats = async (chatId, topCount) => {
     });
 };
 
-// const agregateGroupStatsMigration = async (chatId) => {
-//     const groupDoc = await currentCollection().doc(chatId).collection('users').get();
-// };
+const getGroup = async (chatId) => {
+    const group = await currentCollection().doc(`${chatId}`).get();
+    return ToModel(group.data());
+};
 
 export const GroupDal = {
     getGroups,
-    getGroupStats
+    getGroupStats,
+    getGroup
 };

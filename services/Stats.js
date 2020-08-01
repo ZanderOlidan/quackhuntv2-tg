@@ -27,6 +27,7 @@ const getUser = async (msg) => {
 };
 
 const getTopUserContent = (ctx, chatId, limit) => async (users, titleName, field) => {
+    const sorted = users.sort((a, b) => a.data()[field] < b.data()[field]);
     const userContent = `
 <b>Top ${users.length < limit ? users.length : limit} ${titleName}</b>
 `;
@@ -43,7 +44,7 @@ const getTopUserContent = (ctx, chatId, limit) => async (users, titleName, field
         return `${index}. <a href="tg://user?id=${user.id}">${escapeText(label)}</a>: ${count}
 `;
     };
-    const usersStatResult = await Promise.all(users.map((u, i) => userLineContent(u, i + 1)));
+    const usersStatResult = await Promise.all(sorted.map((u, i) => userLineContent(u, i + 1)));
     return userContent + usersStatResult.join('');
 };
 
@@ -56,7 +57,11 @@ const getGroupStats = async msg => {
         return sendMsg(msg, 'No group stats when not in group.');
     }
     const limit = 5;
-    const data = await GroupDal.getGroupStats(`${msg.chat.id}`, limit);
+    const groupRequests = await Promise.all([
+        GroupDal.getGroupStats(`${msg.chat.id}`, limit),
+        GroupDal.getGroup(msg.chat.id)
+    ]);
+    const groupStats = groupRequests[0];
     const title = `
 <b>🦆📈Group Stats for ${msg.chat.title}</b>
 `;
@@ -64,13 +69,19 @@ const getGroupStats = async msg => {
 
     const userContent = getTopUserContent(msg, msg.chat.id, limit);
     const subcategory = await Promise.all([
-        userContent(data.topKillers, 'Savages', 'kills'),
-        userContent(data.topFriendlies, 'Saviours', 'friends'),
-        userContent(data.topFriendlies, 'Rejections', 'rejects')
+        userContent(groupStats.topKillers, 'Savages', 'kills'),
+        userContent(groupStats.topFriendlies, 'Saviours', 'friends'),
+        userContent(groupStats.topFriendlies, 'Rejections', 'rejects')
     ]);
     for (const cat of subcategory) {
         content += cat;
     }
+    const group = groupRequests[1];
+    content += `
+<b>🔫 Total Kills:</b> ${group.totalKills}
+<b>🥰 Total Friends:</b> ${group.totalFriends}
+<b>🙅‍♀️ Total Rejections:</b> ${group.totalRejects}
+`;
     await sendMsg(msg, content);
 };
 

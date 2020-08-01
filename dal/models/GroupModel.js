@@ -2,10 +2,10 @@ export class GroupModel {
     constructor (o = {
         totalKills: 0,
         totalFriends: 0,
-        totalRejections: 0
+        totalRejecs: 0
     }) {
-        this.totalKills = o.totalKills;
-        this.totalFriends = o.totalFriends;
-        this.totalRejections = o.totalRejections;
+        this.totalKills = o.totalKills || 0;
+        this.totalFriends = o.totalFriends || 0;
+        this.totalRejects = o.totalRejects || 0;
     }
 }
