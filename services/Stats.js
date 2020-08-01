@@ -71,7 +71,7 @@ const getGroupStats = async msg => {
     const subcategory = await Promise.all([
         userContent(groupStats.topKillers, 'Savages', 'kills'),
         userContent(groupStats.topFriendlies, 'Saviours', 'friends'),
-        userContent(groupStats.topFriendlies, 'Rejections', 'rejects')
+        userContent(groupStats.topRejections, 'Rejections', 'rejects')
     ]);
     for (const cat of subcategory) {
         content += cat;
