@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import * as TgApi from 'node-telegram-bot-api';
-import { sendMsg } from '../services.js';
+import { sendMsg, escapeText } from '../services.js';
 import { BOT } from './config.js';
 import { OWNER_ID } from '../constants.js';
 
@@ -21,17 +21,13 @@ const send = async (msg, match) => {
          *
          * @param {string} msg
          */
-        const esc = msg => msg
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/&/g, '&amp;');
-        const message = esc(match[1]);
+        const message = escapeText(match[1]);
         const ownerId = OWNER_ID;
         const getData = async () => {
             let content = '';
             if (msg.reply_to_message) {
                 content += `----------
-<i>${esc(msg.reply_to_message.text)}</i>
+<i>${escapeText(msg.reply_to_message.text)}</i>
 -----------`;
             }
             content += `

@@ -51,6 +51,10 @@ export const hasHunt = (ctx) => {
  */
 export const sendMsg = async (msg, messageContent) => {
     const name = msg.from.first_name || msg.from.username;
+    name
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/&/g, '&amp;');
     const content = `(<a href="tg://user?id=${msg.from.id}">${name}</a>) ${messageContent}`;
 
     await BOT.sendMessage(msg.chat.id, content, { parse_mode: 'HTML' });
@@ -229,3 +233,16 @@ export const stopHunt = async (msg) => {
 
 // @ts-ignore
 export const __dirname = dirname(fileURLToPath(import.meta.url));
+
+export const escapeText = text => text
+    .replace(/</g, '')
+    .replace(/>/g, '')
+    .replace(/&/g, '');
+
+export const escCb = (cb) => (...msg) => {
+    msg[0].from.first_name = escapeText(msg[0].from.first_name);
+    msg[0].chat.title = escapeText(msg[0].chat.title);
+    msg[0].text = escapeText(msg[0].text);
+    // eslint-disable-next-line standard/no-callback-literal
+    return cb(...msg);
+};

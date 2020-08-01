@@ -1,5 +1,5 @@
 import { init as dbInit } from './dal/config.js';
-import { doAction, startHunt, stopHunt } from './services.js';
+import { doAction, startHunt, stopHunt, escCb } from './services.js';
 import { BEF, BANG } from './textmentions.js';
 import { BOT, initializeBot } from './services/config.js';
 import { Stats } from './services/Stats.js';
@@ -14,17 +14,16 @@ import { Migrations } from './services/MigrationServices.js';
     console.log('bot initialized');
 
     try {
-        BOT.onText(/\/starthunt/, async (msg) => startHunt(msg));
-        BOT.onText(/\/bang/, async msg => doAction(msg, BANG));
-        BOT.onText(/\/bef/, async msg => doAction(msg, BEF));
-        BOT.onText(/\/stophunt/, stopHunt);
-        BOT.onText(/\/duckstats/, Stats.getUser);
-        BOT.onText(/\/say ?(.+)?/, Feedback.send);
-        BOT.onText(/\/groupstats/, Stats.getGroupStats);
+        BOT.onText(/\/starthunt/, escCb(startHunt));
+        BOT.onText(/\/bang/, escCb(async msg => doAction(msg, BANG)));
+        BOT.onText(/\/bef/, escCb(async msg => doAction(msg, BEF)));
+        BOT.onText(/\/stophunt/, escCb(stopHunt));
+        BOT.onText(/\/duckstats/, escCb(Stats.getUser));
+        BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
+        BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
 
-
-        BOT.onText(/\/reply (.+)/, Feedback.reply);
-        BOT.onText(/\/migrategroupstats/, Migrations.migrateTotals);
+        BOT.onText(/\/reply (.+)/, escCb(Feedback.reply));
+        BOT.onText(/\/migrategroupstats/, escCb(Migrations.migrateTotals));
     } catch (e) {
         console.error(e);
     }

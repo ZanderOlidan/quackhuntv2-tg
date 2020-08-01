@@ -3,7 +3,7 @@ import * as TgApi from 'node-telegram-bot-api';
 import { GroupUserDal } from '../dal/GroupUserDal.js';
 import { BOT } from './config.js';
 import { DUCKNAME } from '../textmentions.js';
-import { sendMsg } from '../services.js';
+import { sendMsg, escapeText } from '../services.js';
 import { GroupDal } from '../dal/GroupDal.js';
 import { GroupUserModel } from '../dal/models/GroupUserModel.js';
 
@@ -40,7 +40,7 @@ const getTopUserContent = (ctx, chatId, limit) => async (users, titleName, field
         }
 
         const count = new GroupUserModel(user.data())[field];
-        return `${index}. <a href="tg://user?id=${user.id}">${label}</a>: ${count}
+        return `${index}. <a href="tg://user?id=${user.id}">${escapeText(label)}</a>: ${count}
 `;
     };
     const usersStatResult = await Promise.all(users.map((u, i) => userLineContent(u, i + 1)));
