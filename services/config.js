@@ -1,7 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import Tgfancy from 'tgfancy';
 import { TELEGRAM_TOKEN, WEBHOOK_PORT, ENVIRONMENT, SIGNED_CERT, WEBHOOK_URL } from '../constants.js';
-import { BootstrapServices } from './BootstrapServices.js';
 
 /**
  * @type {Tgfancy}

@@ -3,6 +3,10 @@ import * as TgApi from 'node-telegram-bot-api';
 import { GroupUserDal } from '../dal/GroupUserDal.js';
 import { BOT } from './config.js';
 import { DUCKNAME } from '../textmentions.js';
+import { sendMsg } from '../services.js';
+import { GroupDal } from '../dal/GroupDal.js';
+import { GroupUserModel } from '../dal/models/GroupUserModel.js';
+
 /**
  *
  * @param {TgApi.Message} msg
@@ -22,10 +26,55 @@ const getUser = async (msg) => {
     return BOT.sendMessage(msg.chat.id, content, { parse_mode: 'HTML' });
 };
 
-// const getGroupStats = async (msg) => {
-//     const data = await GroupDa
-// };
+const getTopUserContent = (ctx, chatId, limit) => async (users, titleName, field) => {
+    const userContent = `
+<b>Top ${users.length < limit ? users.length : limit} ${titleName}</b>
+`;
+    const userLineContent = async (user, index) => {
+        let label;
+        try {
+            const chatmember = await BOT.getChatMember(chatId, user.id);
+            label = chatmember.user.first_name || chatmember.user.username || user.id;
+        } catch (e) {
+            label = user.id;
+        }
+
+        const count = new GroupUserModel(user.data())[field];
+        return `${index}. <a href="tg://user?id=${user.id}">${label}</a>: ${count}
+`;
+    };
+    const usersStatResult = await Promise.all(users.map((u, i) => userLineContent(u, i + 1)));
+    return userContent + usersStatResult.join('');
+};
+
+/**
+ *
+ * @param {TgApi.Message} msg
+ */
+const getGroupStats = async msg => {
+    if (msg.chat.type === 'private') {
+        return sendMsg(msg, 'No group stats when not in group.');
+    }
+    const limit = 5;
+    const data = await GroupDal.getGroupStats(`${msg.chat.id}`, limit);
+    const title = `
+<b>🦆📈Group Stats for ${msg.chat.title}</b>
+`;
+    let content = title;
+
+    const userContent = getTopUserContent(msg, msg.chat.id, limit);
+    const subcategory = await Promise.all([
+        userContent(data.topKillers, 'Savages', 'kills'),
+        userContent(data.topFriendlies, 'Saviours', 'friends'),
+        userContent(data.topFriendlies, 'Rejections', 'rejects')
+    ]);
+    for (const cat of subcategory) {
+        content += cat;
+    }
+    await sendMsg(msg, content);
+};
 
 export const Stats = {
-    getUser
+    getUser,
+    getGroupStats
 };

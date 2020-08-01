@@ -42,7 +42,6 @@ const setNextDuck = async (ctx, d) => {
     }, { merge: true });
 };
 
-// -1001220054056
 /**
  *
  * @param {number} chatId

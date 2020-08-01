@@ -29,15 +29,33 @@ const incrementType = async (ctx, actionType) => {
     };
 
     const content = {
-        [key[actionType]]: INCREMENT_ONE
+        [key[actionType]]: INCREMENT_ONE,
+        name: ctx.from.first_name || ctx.from.username || ctx.from.id
     };
+    const batch = DB.batch();
     const user = currentUser(ctx);
-    await user.set(content, { merge: true });
+    batch.set(user, content, { merge: true });
+
+    const groupStat = DB.collection('groups').doc(`${ctx.chat.id}`);
+    const actionName = key[actionType][0].toUpperCase() + key[actionType].slice(1);
+    batch.set(groupStat, { [`total${actionName}`]: INCREMENT_ONE }, { merge: true });
+    await batch.commit();
     const u = await user.get();
     return ToModel(u.data());
 };
 
+/**
+ *
+ * @param {TgApi.Message} ctx
+ * @param {GroupUserModel} content
+ */
+const updateUser = async (ctx, content) => {
+    const user = currentUser(ctx);
+    await user.set(content, { merge: true });
+};
+
 export const GroupUserDal = {
     incrementType,
-    getUserStat
+    getUserStat,
+    updateUser
 };

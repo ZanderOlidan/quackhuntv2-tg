@@ -1,8 +1,8 @@
 // eslint-disable-next-line no-unused-vars
 import * as TgApi from 'node-telegram-bot-api';
 import Schedule from 'node-schedule';
-import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN, VERSION } from './constants.js';
-import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES } from './textmentions.js';
+import { FAIL_RATE, TO_WINDOW, FROM_WINDOW, USER_MESSAGE_COOLDOWN, VERSION, FRIYAY } from './constants.js';
+import { NO_HUNT_IN_GAME, BANG_SUCCESS, BANG_NONEXISTENT, BANG_FAIL_MESSAGES, BEF_SUCCESS, BEF_NONEXISTENT, BEF_FAIL_MESSAGES, START_HUNT, HUNT_STARTED, COOLDOWN_MESSAGES, SELFHUNT } from './textmentions.js';
 import dayjs from 'dayjs';
 import { BOT } from './services/config.js';
 import { dirname } from 'path';
@@ -11,6 +11,7 @@ import { RunningHuntsDal } from './dal/RunningHuntsDal.js';
 import { State } from './memoryState.js';
 import utc from 'dayjs/plugin/utc.js';
 import { GroupUserDal } from './dal/GroupUserDal.js';
+import { Exceptions } from './services/Exceptions.js';
 
 dayjs.extend(utc);
 /**
@@ -60,13 +61,25 @@ export const sendMsg = async (msg, messageContent) => {
  * @param {TgApi.Message} msg
  */
 export const scheduleNextDuck = async (msg) => {
-    const rangeFrom = dayjs().add(FROM_WINDOW, 's').unix();
-    const rangeTo = dayjs().add(TO_WINDOW, 's').unix();
+    let window = {
+        f: FROM_WINDOW,
+        t: TO_WINDOW
+    };
+    // Get second half of friday
+    if (dayjs().day() === 5 && dayjs().hour() >= 12 && FRIYAY) {
+        window = {
+            f: FROM_WINDOW / FRIYAY,
+            t: TO_WINDOW / FRIYAY
+        };
+    }
+    const rangeFrom = dayjs().add(window.f, 's').unix();
+    const rangeTo = dayjs().add(window.t, 's').unix();
     const randomNumber = Math.floor(Math.random() * (rangeTo - rangeFrom) + rangeFrom);
 
     const d = dayjs.unix(randomNumber);
 
-    console.log(msg.chat.title, msg.chat.id, d.toISOString());
+    State.uniqueGroups[msg.chat.id] = msg.chat.title;
+    console.log(msg.chat.title, msg.chat.id, d.toISOString(), 'ChatCount -', Object.keys(State.uniqueGroups).length);
 
     setDuckOut(msg, false);
     await RunningHuntsDal.setNextDuck(msg, d.toISOString());
@@ -83,7 +96,12 @@ export const scheduleDuckJob = async (chatId, date) => {
     State.jobschedules[chatId] = Schedule.scheduleJob(date, async () => {
         if (State.chatHasHunt[chatId]) {
             State.duckTimerStorage[chatId] = dayjs().toISOString();
-            await BOT.sendMessage(chatId, '・゜゜・。🦆QUACK!・゜゜・。');
+            try {
+                await BOT.sendMessage(chatId, '・゜゜・。🦆QUACK!・゜゜・。');
+            } catch (e) {
+                await Exceptions.handle403(e, chatId);
+                console.log(`Cannot schedule duck for ${chatId}`, e);
+            }
             State.chatHasDuckOut[chatId] = true;
         }
     });
@@ -174,6 +192,9 @@ export const doAction = async (msg, actionType) => {
  */
 export const startHunt = async (msg, isManualStart = true) => {
     if (!hasHunt(msg)) {
+        if (msg.chat.type === 'private') {
+            return BOT.sendMessage(msg.chat.id, SELFHUNT);
+        }
         if (isManualStart) {
             await BOT.sendMessage(msg.chat.id, START_HUNT);
         }

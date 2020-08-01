@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc.js';
 import { BOT } from './config.js';
 import * as fs from 'fs';
 import { VERSION } from '../constants.js';
+import { Exceptions } from './Exceptions.js';
 dayjs.extend(utc);
 
 /**
@@ -17,7 +18,6 @@ const initializeHuntWorker = async (chatId, date) => {
     State.chatHasHunt[chatId] = true;
 
     const nextDuck = dayjs.utc(date);
-    // check for hanging duck after the restart
     if (nextDuck.isBefore(dayjs())) {
         await scheduleDuckJob(chatId, dayjs().add(2, 's').toDate());
     } else {
@@ -41,7 +41,8 @@ const showChangelog = async () => {
             try {
                 await BOT.sendMessage(g.id, contents, { parse_mode: 'HTML' });
             } catch (e) {
-                await RunningHuntsDal.deleteGroup(g.id);
+                await Exceptions.handle403(e, g.id);
+                console.error(`Cannot send changelog for ${g.id}`, e);
             }
         }
     }));

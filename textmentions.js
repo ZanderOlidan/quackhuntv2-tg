@@ -1,9 +1,9 @@
 export const DUCKNAME = 'DUCK';
 export const BANG = 'BANG';
 export const BEF = 'BEF';
-export const START_HUNT = 'Prepare your guns and soft petting hands. The hunt begins...';
+export const START_HUNT = 'Prepare your guns and soft petting hands. See how many you can shoot or save.';
 export const HUNT_STARTED = 'Hunt has started. Patience patience.';
-export const NO_HUNT_IN_GAME = 'There is no hunt going on. Start the hunt with /starthunt';
+export const NO_HUNT_IN_GAME = 'There is no hunt happening. Start the hunt with /starthunt';
 export const BANG_NONEXISTENT = [
     'BRRRTT BRTTTT Nuginagamue? Walang bibe oyy!',
     'What\'ya shootin\' at bruh?'
@@ -20,7 +20,8 @@ export const BEF_SUCCESS = [
 export const BANG_FAIL_MESSAGES = [
     'You missed HAHAHAA What a nub! ',
     'Your gun jammed. Weh woh. ',
-    'Lil duck used evade. It\'s super effective! '
+    'Lil duck used evade. It\'s super effective! ',
+    'Dfok? Are you Kim Jong Un firing missiles? You missed wahaha!'
 ];
 export const BEF_FAIL_MESSAGES = [
     'Who knew ducks can be so picky.',
@@ -32,3 +33,4 @@ export const COOLDOWN_MESSAGES = [
     'Kulit ah! Gusto mo palo? Wait ka lang ng',
     'Tsk tsk, no can do. Have at it after'
 ];
+export const SELFHUNT = 'No hunting by yourself, that isn\'t safe.';

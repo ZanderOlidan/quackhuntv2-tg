@@ -21,6 +21,9 @@ For Prod, setup your own webhook url. Create certs if you have to.
 - [ ] PAKAK GURL! Nakabingwit ka na naman ng patola in 18.534 seconds. You have befriended 6 patolas
 - [ ] Template strings
 - [ ] Custom Language
+- [ ] Group stats
+    - Top 10 using queries
+- [ ] Don't use remove running stats for active. Use queries on groups instead
 
 ## When changing something
 

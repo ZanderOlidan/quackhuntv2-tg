@@ -1,7 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import * as TgApi from 'node-telegram-bot-api';
 import { sendMsg } from '../services.js';
-import dayjs from 'dayjs';
 import { BOT } from './config.js';
 import { OWNER_ID } from '../constants.js';
 
@@ -11,34 +10,51 @@ import { OWNER_ID } from '../constants.js';
  * @param {*} match
  */
 const send = async (msg, match) => {
-    if (match.length < 2) {
-        await sendMsg(msg, `
-Pssst. Can't give feedback with an empty message like so
+    if (match[0].split(' ').length === 1) {
+        await sendMsg(msg, `Pssst. Can't send an empty message.
 
 <code>/say Kiss my ass, Dev!</code>
 
 `);
     } else {
-        const message = match[1];
+        /**
+         *
+         * @param {string} msg
+         */
+        const esc = msg => msg
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/&/g, '&amp;');
+        const message = esc(match[1]);
         const ownerId = OWNER_ID;
-        const date = dayjs(dayjs.unix(msg.date)).toDate().toLocaleString('en-GB', { timeZone: 'Asia/Hong_Kong' });
-        // send to dev
-        await BOT.sendMessage(ownerId, `
-${date} - ${msg.from.first_name} ${msg.from.username || ''} ${msg.from.id}
-${msg.chat.id} - ${msg.chat.title || ''}
-
+        const getData = async () => {
+            let content = '';
+            if (msg.reply_to_message) {
+                content += `----------
+<i>${esc(msg.reply_to_message.text)}</i>
+-----------`;
+            }
+            content += `
+${msg.from.id}
 ${message}
-
-===================
-`, { parse_mode: 'HTML' });
+<a href="tg://user?id=${msg.chat.id}">${msg.chat.id}</a> (${msg.chat.type === 'private' ? msg.chat.first_name : msg.chat.title ? msg.chat.title : ''})
+`;
+            await BOT.sendMessage(ownerId, content, { parse_mode: 'HTML' });
+        };
+        // send to dev
+        await Promise.all([
+            getData(),
+            BOT.forwardMessage(ownerId, msg.chat.id, msg.message_id)
+        ]);
         // send to user
-        await sendMsg(msg, 'Feedback sent. Thanks! UwU ❤️');
+        await sendMsg(msg, 'Message sent. Thanks! UwU ❤️');
     }
 };
 
 const reply = async (msg, match) => {
-    const location = match[1].split(' ')[0];
-    const message = match[1].split(' ').slice(1).join('');
+    const sp = match[1].split(' ');
+    const location = sp[0];
+    const message = sp.slice(1).join(' ');
 
     await BOT.sendMessage(location, message);
 };
