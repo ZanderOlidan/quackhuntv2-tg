@@ -240,9 +240,9 @@ export const escapeText = text => text
     .replace(/&/g, '');
 
 export const escCb = (cb) => (...msg) => {
-    msg[0].from.first_name = escapeText(msg[0].from.first_name);
-    msg[0].chat.title = escapeText(msg[0].chat.title);
-    msg[0].text = escapeText(msg[0].text);
+    msg[0].from.first_name = escapeText(msg[0].from.first_name || '');
+    msg[0].chat.title = escapeText(msg[0].chat.title || '');
+    msg[0].text = escapeText(msg[0].text || '');
     // eslint-disable-next-line standard/no-callback-literal
     return cb(...msg);
 };
