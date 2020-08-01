@@ -234,15 +234,20 @@ export const stopHunt = async (msg) => {
 // @ts-ignore
 export const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export const escapeText = text => text
-    .replace(/</g, '')
-    .replace(/>/g, '')
-    .replace(/&/g, '');
+export const escapeText = text => {
+    if (text) {
+        return text
+            .replace(/</g, '')
+            .replace(/>/g, '')
+            .replace(/&/g, '');
+    }
+    return text;
+};
 
 export const escCb = (cb) => (...msg) => {
-    msg[0].from.first_name = escapeText(msg[0].from.first_name || '');
-    msg[0].chat.title = escapeText(msg[0].chat.title || '');
-    msg[0].text = escapeText(msg[0].text || '');
+    msg[0].from.first_name = escapeText(msg[0].from.first_name);
+    msg[0].chat.title = escapeText(msg[0].chat.title);
+    msg[0].text = escapeText(msg[0].text);
     // eslint-disable-next-line standard/no-callback-literal
     return cb(...msg);
 };
