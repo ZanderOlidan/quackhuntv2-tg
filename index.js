@@ -21,6 +21,7 @@ import { Migrations } from './services/MigrationServices.js';
         BOT.onText(/\/duckstats/, escCb(Stats.getUser));
         BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
         BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
+        BOT.onText(/\/jowa/, async msg => await BOT.sendMessage(msg.chat.id, 'Cherot'));
 
         BOT.onText(/\/reply (.+)/, ownerOnly(escCb(Feedback.reply)));
         BOT.onText(/\/migrategroupstats/, ownerOnly(escCb(Migrations.migrateTotals)));
