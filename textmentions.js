@@ -26,7 +26,8 @@ export const BANG_FAIL_MESSAGES = [
 export const BEF_FAIL_MESSAGES = [
     'Who knew ducks can be so picky.',
     'Social distancing daw! ',
-    'HA! Pati making duck friends, rejected ka padin! 😂 '
+    'HA! Pati making duck friends, rejected ka padin! 😂 ',
+    'Ayaw ni bibe mafriendzone sayo. '
 ];
 export const COOLDOWN_MESSAGES = [
     '=.= Chillax bruh. You on cooldown. Try again in',

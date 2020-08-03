@@ -35,13 +35,20 @@ const send = async (msg, match) => {
                     const photoMeta = msg.reply_to_message.photo;
                     await BOT.sendPhoto(ownerId, photoMeta[0].file_id);
                 }
+
+                if (msg.reply_to_message.voice) {
+                    await BOT.sendVoice(ownerId, msg.reply_to_message.voice.file_id);
+                }
             }
             content += `
-${msg.from.id}
-${message || ''}
+MessageId: ${msg.message_id}
+UserId: ${msg.from.id}
+Content: ${message || ''}
 <a href="tg://${msg.chat.id}">${msg.chat.id}</a> (${msg.chat.type === 'private' ? msg.chat.first_name : msg.chat.title ? msg.chat.title : ''})
 `;
-            await BOT.sendMessage(ownerId, content, { parse_mode: 'HTML' });
+            await BOT.sendMessage(ownerId, content, {
+                parse_mode: 'HTML'
+            });
         };
         // send to dev
         await Promise.all([
@@ -49,7 +56,9 @@ ${message || ''}
             BOT.forwardMessage(ownerId, msg.chat.id, msg.message_id)
         ]);
         // send to user
-        await sendMsg(msg, 'Message sent. Thanks! UwU ❤️');
+        await BOT.sendMessage(msg.chat.id, 'Message sent. Thanks! ❤️', {
+            reply_to_message_id: msg.message_id
+        });
     }
 };
 
@@ -83,7 +92,8 @@ const sendDice = async (msg, match) => {
     const res = await BOT.sendDice(location, {
         emoji: '🏀'
     });
-    console.log(res);
+    // @ts-ignore
+    await BOT.sendMessage(res.dice.value);
 };
 export const Feedback = {
     send,
