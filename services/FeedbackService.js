@@ -79,6 +79,22 @@ const reply = async (msg, match) => {
     await BOT.sendMessage(location, message);
 };
 
+const replyReply = async (msg, match) => {
+    const sp = match[1].split(' ');
+    const location = sp[0];
+    const reprep = sp[1];
+    const message = sp.slice(2).join(' ');
+    if (msg.reply_to_message && msg.reply_to_message.photo) {
+        const photo = msg.reply_to_message.photo;
+        return BOT.sendPhoto(location, photo[0].file_id, {
+            caption: message || '',
+            reply_to_message_id: reprep
+        });
+    }
+    await BOT.sendMessage(location, message, {
+        reply_to_message_id: reprep
+    });
+};
 /**
  *
  * @param {TgApi.Message} msg
@@ -98,5 +114,6 @@ const sendDice = async (msg, match) => {
 export const Feedback = {
     send,
     reply,
-    sendDice
+    sendDice,
+    replyReply
 };
