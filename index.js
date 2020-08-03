@@ -24,6 +24,7 @@ import { Migrations } from './services/MigrationServices.js';
 
         BOT.onText(/\/reply (.+)/, ownerOnly(escCb(Feedback.reply)));
         BOT.onText(/\/migrategroupstats/, ownerOnly(escCb(Migrations.migrateTotals)));
+        BOT.onText(/\/dice (.+)/, ownerOnly(escCb(Feedback.sendDice)));
     } catch (e) {
         console.error(e);
     }

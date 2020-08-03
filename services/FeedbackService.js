@@ -62,14 +62,31 @@ const reply = async (msg, match) => {
     const sp = match[1].split(' ');
     const location = sp[0];
     const message = sp.slice(1).join(' ');
-    if (msg.reply_to_message.photo) {
+    if (msg.reply_to_message && msg.reply_to_message.photo) {
         const photo = msg.reply_to_message.photo;
-        return await BOT.sendPhoto(location, photo[0].file_id, { caption: message || '' });
+        return BOT.sendPhoto(location, photo[0].file_id, { caption: message || '' });
     }
 
     await BOT.sendMessage(location, message);
 };
+
+/**
+ *
+ * @param {TgApi.Message} msg
+ */
+const sendDice = async (msg, match) => {
+    const sp = match[1].split(' ');
+    const location = sp[0];
+    if (!location) {
+        return BOT.sendMessage(msg.chat.id, 'dumbass add location');
+    }
+    const res = await BOT.sendDice(location, {
+        emoji: '🏀'
+    });
+    console.log(res);
+};
 export const Feedback = {
     send,
-    reply
+    reply,
+    sendDice
 };
