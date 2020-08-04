@@ -108,6 +108,7 @@ const sendDice = async (msg, match) => {
     const res = await BOT.sendDice(location, {
         emoji: '🏀'
     });
+    console.log(res);
     // @ts-ignore
     await BOT.sendMessage(res.dice.value);
 };
