@@ -24,6 +24,7 @@ For Prod, setup your own webhook url. Create certs if you have to.
 - [ ] Group stats
     - Top 10 using queries
 - [ ] Don't use remove running stats for active. Use queries on groups instead
+- [ ] Rehaul the `runninghunts` into the groupdal instead
 
 ## When changing something
 

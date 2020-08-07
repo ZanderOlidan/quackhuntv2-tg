@@ -6,6 +6,7 @@ import { Stats } from './services/Stats.js';
 import { Feedback } from './services/FeedbackService.js';
 import { BootstrapServices } from './services/BootstrapServices.js';
 import { Migrations } from './services/MigrationServices.js';
+import { Events } from './services/Events.js';
 
 (async () => {
     dbInit();
@@ -21,11 +22,13 @@ import { Migrations } from './services/MigrationServices.js';
         BOT.onText(/\/duckstats/, escCb(Stats.getUser));
         BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
         BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
+        // BOT.onText(/\/friyay/, escCb(Events.))
 
         BOT.onText(/\/reprep (.+)/, escCb(Feedback.replyReply));
         BOT.onText(/\/reply (.+)/, ownerOnly(escCb(Feedback.reply)));
         BOT.onText(/\/migrategroupstats/, ownerOnly(escCb(Migrations.migrateTotals)));
         BOT.onText(/\/dice (.+)/, ownerOnly(escCb(Feedback.sendDice)));
+        BOT.onText(/\/announce (.+)/, ownerOnly(escCb(Events.announce)));
     } catch (e) {
         console.error(e);
     }
