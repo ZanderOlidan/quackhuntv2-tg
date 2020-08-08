@@ -44,7 +44,7 @@ const send = async (msg, match) => {
 MessageId: ${msg.message_id}
 UserId: ${msg.from.id}
 Content: ${message || ''}
-<a href="tg://${msg.chat.id}">${msg.chat.id}</a> (${msg.chat.type === 'private' ? msg.chat.first_name : msg.chat.title ? msg.chat.title : ''})
+<a href="tel:${msg.chat.id}">${msg.chat.id}</a> (${msg.chat.type === 'private' ? msg.chat.first_name : msg.chat.title ? msg.chat.title : ''})
 `;
             await BOT.sendMessage(ownerId, content, {
                 parse_mode: 'HTML'
@@ -108,9 +108,8 @@ const sendDice = async (msg, match) => {
     const res = await BOT.sendDice(location, {
         emoji: '🏀'
     });
-    console.log(res);
     // @ts-ignore
-    await BOT.sendMessage(res.dice.value);
+    await BOT.sendMessage(OWNER_ID, res.dice.value);
 };
 export const Feedback = {
     send,

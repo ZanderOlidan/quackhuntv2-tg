@@ -10,10 +10,12 @@ import { fileURLToPath } from 'url';
 import { RunningHuntsDal } from './dal/RunningHuntsDal.js';
 import { State } from './memoryState.js';
 import utc from 'dayjs/plugin/utc.js';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { GroupUserDal } from './dal/GroupUserDal.js';
 import { Exceptions } from './services/Exceptions.js';
 
 dayjs.extend(utc);
+dayjs.extend(relativeTime);
 /**
  *
  * @param {TgApi.Message} msg
@@ -70,7 +72,7 @@ export const scheduleNextDuck = async (msg) => {
         t: TO_WINDOW
     };
     // Get second half of friday
-    if (dayjs().day() === 5 && dayjs().hour() >= 12 && FRIYAY) {
+    if (dayjs().utcOffset(8).day() === 5 && dayjs().utcOffset(8).hour() >= 12 && FRIYAY) {
         window = {
             f: FROM_WINDOW / FRIYAY,
             t: TO_WINDOW / FRIYAY
@@ -83,7 +85,7 @@ export const scheduleNextDuck = async (msg) => {
     const d = dayjs.unix(randomNumber);
 
     State.uniqueGroups[msg.chat.id] = msg.chat.title;
-    console.log(msg.chat.title, msg.chat.id, d.toISOString(), 'ChatCount -', Object.keys(State.uniqueGroups).length);
+    console.log(msg.chat.title, msg.chat.id, d.utcOffset(8).format('HH:ss'), 'ChatCount -', Object.keys(State.uniqueGroups).length);
 
     setDuckOut(msg, false);
     await RunningHuntsDal.setNextDuck(msg, d.toISOString());
