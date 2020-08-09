@@ -43,8 +43,8 @@ const send = async (msg, match) => {
             content += `
 MessageId: ${msg.message_id}
 Content: ${message || ''}
-<a href="tg://userId=${msg.chat.id}">${msg.chat.id}</a> (${msg.chat.type === 'private' ? msg.chat.first_name : msg.chat.title ? msg.chat.title : ''})
-Type: ${msg.chat.type} - ${msg.from.username ? msg.from.username : ''}
+<a href="tg://user?id=${msg.chat.id}">${msg.chat.id}</a> (${msg.chat.type === 'private' ? msg.chat.first_name : msg.chat.title ? msg.chat.title : ''})
+Type: ${msg.chat.type} - ${msg.from.username ? `@${msg.from.username}` : ''}
 `;
             await BOT.sendMessage(ownerId, content, {
                 parse_mode: 'HTML'
