@@ -85,7 +85,7 @@ export const scheduleNextDuck = async (msg) => {
     const d = dayjs.unix(randomNumber);
 
     State.uniqueGroups[msg.chat.id] = msg.chat.title;
-    console.log(msg.chat.title, msg.chat.id, d.utcOffset(8).format('HH:ss'), 'ChatCount -', Object.keys(State.uniqueGroups).length);
+    console.log(msg.chat.title, msg.chat.id, d.utc().utcOffset(8).format('HH:ss'), 'ChatCount -', Object.keys(State.uniqueGroups).length);
 
     setDuckOut(msg, false);
     await RunningHuntsDal.setNextDuck(msg, d.toISOString());
