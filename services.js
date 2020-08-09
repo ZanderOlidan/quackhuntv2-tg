@@ -108,6 +108,7 @@ export const scheduleDuckJob = async (chatId, date) => {
             } catch (e) {
                 await Exceptions.handle403(e, chatId);
                 console.error(`Cannot schedule duck for ${chatId}`, e);
+                await BOT.sendMessage(OWNER_ID, `ERROR: Cannot schedule duck for ${chatId}`, e.response.body.description);
             }
         }
     });
