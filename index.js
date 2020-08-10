@@ -9,7 +9,7 @@ import { Migrations } from './services/MigrationServices.js';
 import { Events } from './services/Events.js';
 
 (async () => {
-    dbInit();
+    await dbInit();
     console.log('DB initialized');
     await initializeBot();
     console.log('bot initialized');
