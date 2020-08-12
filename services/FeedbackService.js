@@ -111,9 +111,23 @@ const sendDice = async (msg, match) => {
     // @ts-ignore
     await BOT.sendMessage(OWNER_ID, res.dice.value);
 };
+
+/**
+ *
+ * @param {TgApi.Message} ctx
+ */
+const receivePrivate = async (ctx) => {
+    if (ctx.chat.type === 'private' &&
+        !ctx.text.startsWith('/say') &&
+        ctx.from.id !== OWNER_ID) {
+        await BOT.forwardMessage(OWNER_ID, ctx.chat.id, ctx.message_id);
+        await BOT.sendMessage(OWNER_ID, `!!! ${ctx.text}`);
+    }
+};
 export const Feedback = {
     send,
     reply,
     sendDice,
-    replyReply
+    replyReply,
+    receivePrivate
 };
