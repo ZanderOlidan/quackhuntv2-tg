@@ -109,7 +109,7 @@ const sendDice = async (msg, match) => {
         emoji: '🏀'
     });
     // @ts-ignore
-    await BOT.sendMessage(OWNER_ID, res.dice.value);
+    await BOT.sendMessage(OWNER_ID, `(${location}) Dice value: ${res.dice.value}`);
 };
 
 /**
@@ -120,8 +120,10 @@ const receivePrivate = async (ctx) => {
     if (ctx.chat.type === 'private' &&
         !ctx.text.startsWith('/say') &&
         ctx.from.id !== OWNER_ID) {
-        await BOT.forwardMessage(OWNER_ID, ctx.chat.id, ctx.message_id);
-        await BOT.sendMessage(OWNER_ID, `!!! ${ctx.text}`);
+        await Promise.all([
+            BOT.forwardMessage(OWNER_ID, ctx.chat.id, ctx.message_id),
+            BOT.sendMessage(OWNER_ID, `!!! ${ctx.text}`)
+        ]);
     }
 };
 export const Feedback = {

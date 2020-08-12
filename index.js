@@ -7,7 +7,6 @@ import { Feedback } from './services/FeedbackService.js';
 import { BootstrapServices } from './services/BootstrapServices.js';
 import { Migrations } from './services/MigrationServices.js';
 import { Events } from './services/Events.js';
-import { OWNER_ID } from './constants.js';
 
 (async () => {
     await dbInit();
@@ -23,7 +22,7 @@ import { OWNER_ID } from './constants.js';
         BOT.onText(/\/duckstats/, escCb(Stats.getUser));
         BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
         BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
-        BOT.on('message', escCb(Feedback.receivePrivate));
+        // BOT.on('message', escCb(Feedback.receivePrivate));
         // BOT.onText(/\/friyay/, escCb(Events.))
 
         BOT.onText(/\/reprep (.+)/, escCb(Feedback.replyReply));

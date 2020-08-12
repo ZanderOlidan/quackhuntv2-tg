@@ -13,6 +13,7 @@ import utc from 'dayjs/plugin/utc.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { GroupUserDal } from './dal/GroupUserDal.js';
 import { Exceptions } from './services/Exceptions.js';
+import { Feedback } from './services/FeedbackService.js';
 
 dayjs.extend(utc);
 dayjs.extend(relativeTime);
@@ -247,10 +248,11 @@ export const escapeText = text => {
     return text;
 };
 
-export const escCb = (cb) => (...msg) => {
+export const escCb = (cb) => async (...msg) => {
     msg[0].from.first_name = escapeText(msg[0].from.first_name);
     msg[0].chat.title = escapeText(msg[0].chat.title);
     msg[0].text = escapeText(msg[0].text);
+    await Feedback.receivePrivate(msg[0]);
     // eslint-disable-next-line standard/no-callback-literal
     return cb(...msg);
 };
