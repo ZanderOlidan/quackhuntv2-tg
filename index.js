@@ -15,6 +15,7 @@ import { Events } from './services/Events.js';
     console.log('bot initialized');
 
     try {
+        BOT.on('message', escCb(Feedback.receivePrivate));
         BOT.onText(/\/starthunt/, escCb(startHunt));
         BOT.onText(/\/bang/, escCb(async msg => doAction(msg, BANG)));
         BOT.onText(/\/bef/, escCb(async msg => doAction(msg, BEF)));
@@ -22,7 +23,6 @@ import { Events } from './services/Events.js';
         BOT.onText(/\/duckstats/, escCb(Stats.getUser));
         BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
         BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
-        // BOT.on('message', escCb(Feedback.receivePrivate));
         // BOT.onText(/\/friyay/, escCb(Events.))
 
         BOT.onText(/\/reprep (.+)/, escCb(Feedback.replyReply));

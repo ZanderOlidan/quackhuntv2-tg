@@ -118,7 +118,7 @@ const sendDice = async (msg, match) => {
  */
 const receivePrivate = async (ctx) => {
     if (ctx.chat.type === 'private' &&
-        !ctx.text.startsWith('/say') &&
+        !ctx.text.startsWith('/') &&
         ctx.from.id !== OWNER_ID) {
         await Promise.all([
             BOT.forwardMessage(OWNER_ID, ctx.chat.id, ctx.message_id),

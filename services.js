@@ -252,7 +252,7 @@ export const escCb = (cb) => async (...msg) => {
     msg[0].from.first_name = escapeText(msg[0].from.first_name);
     msg[0].chat.title = escapeText(msg[0].chat.title);
     msg[0].text = escapeText(msg[0].text);
-    await Feedback.receivePrivate(msg[0]);
+    // await Feedback.receivePrivate(msg[0]);
     // eslint-disable-next-line standard/no-callback-literal
     return cb(...msg);
 };
