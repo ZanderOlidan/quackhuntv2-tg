@@ -11,11 +11,14 @@ import { RunningHuntsDal } from './dal/RunningHuntsDal.js';
 import { State } from './memoryState.js';
 import utc from 'dayjs/plugin/utc.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { GroupUserDal } from './dal/GroupUserDal.js';
 import { Exceptions } from './services/Exceptions.js';
 import { Feedback } from './services/FeedbackService.js';
+import { time } from 'console';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(relativeTime);
 /**
  *
@@ -68,25 +71,27 @@ export const sendMsg = async (msg, messageContent) => {
  * @param {TgApi.Message} msg
  */
 export const scheduleNextDuck = async (msg) => {
+    const timezone = 'Asia/Hong_Kong';
+    const currentTime = dayjs.utc().tz(timezone);
     let window = {
         f: FROM_WINDOW,
         t: TO_WINDOW
     };
     // Get second half of friday
-    if (dayjs().utcOffset(8).day() === 5 && dayjs().utcOffset(8).hour() >= 12 && FRIYAY) {
+    if (currentTime.day() === 5 && currentTime.hour() >= 12 && FRIYAY) {
         window = {
             f: FROM_WINDOW / FRIYAY,
             t: TO_WINDOW / FRIYAY
         };
     }
-    const rangeFrom = dayjs().add(window.f, 's').unix();
-    const rangeTo = dayjs().add(window.t, 's').unix();
+    const rangeFrom = currentTime.add(window.f, 's').unix();
+    const rangeTo = currentTime.add(window.t, 's').unix();
     const randomNumber = Math.floor(Math.random() * (rangeTo - rangeFrom) + rangeFrom);
 
     const d = dayjs.unix(randomNumber);
 
     State.uniqueGroups[msg.chat.id] = msg.chat.title;
-    console.log(msg.chat.title, msg.chat.id, d.utc().utcOffset(8).format('HH:ss'), 'ChatCount -', Object.keys(State.uniqueGroups).length);
+    console.log(dayjs().tz(timezone).format('HH:mm:ss'), msg.chat.title, msg.chat.id, d.tz(timezone).format('HH:mm:ss'), 'ChatCount -', Object.keys(State.uniqueGroups).length);
 
     setDuckOut(msg, false);
     await RunningHuntsDal.setNextDuck(msg, d.toISOString());
