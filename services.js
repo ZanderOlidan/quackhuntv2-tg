@@ -182,9 +182,7 @@ export const doAction = async (msg, actionType) => {
         return sendMsg(msg, `${generateMessage(COOLDOWN_MESSAGES)} ${inCd} seconds`);
     }
 
-    const succ = isSuccessAction(msg.from.id);
-    console.log('action', succ);
-    if (succ) {
+    if (isSuccessAction(msg.from.id)) {
         scheduleNextDuck(msg);
         const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id], 's', true);
 
