@@ -14,8 +14,6 @@ import relativeTime from 'dayjs/plugin/relativeTime.js';
 import timezone from 'dayjs/plugin/timezone.js';
 import { GroupUserDal } from './dal/GroupUserDal.js';
 import { Exceptions } from './services/Exceptions.js';
-import { Feedback } from './services/FeedbackService.js';
-import { time } from 'console';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -129,7 +127,15 @@ export const generateMessage = (list) => {
     return list[index];
 };
 
-const isSuccessAction = () => {
+/**
+ * @param {number} userId
+ */
+const isSuccessAction = (userId) => {
+    // Protection against multiple rejections in a row
+    const userCd = State.userCooldown[userId];
+    if (userCd && dayjs().isBefore(dayjs(userCd).add(1, 'm'))) {
+        return true;
+    }
     const rand = Math.random();
     return rand > FAIL_RATE;
 };
@@ -176,7 +182,9 @@ export const doAction = async (msg, actionType) => {
         return sendMsg(msg, `${generateMessage(COOLDOWN_MESSAGES)} ${inCd} seconds`);
     }
 
-    if (isSuccessAction()) {
+    const succ = isSuccessAction(msg.from.id);
+    console.log('action', succ);
+    if (succ) {
         scheduleNextDuck(msg);
         const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id], 's', true);
 

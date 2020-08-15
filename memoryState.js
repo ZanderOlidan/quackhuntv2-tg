@@ -3,7 +3,7 @@ const chatHasDuckOut = {};
 const chatHasHunt = {};
 const jobschedules = {};
 const userCooldown = {};
-const uniqueGroups = {};
+const uniqueGroups = {}; // This one's for logging
 
 export const State = {
     duckTimerStorage,

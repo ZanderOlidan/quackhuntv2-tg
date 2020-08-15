@@ -41,7 +41,7 @@ const getTopUserContent = (ctx, chatId, limit) => async (users, titleName, field
         }
 
         const count = new GroupUserModel(user.data())[field];
-        return `${index}. <a href="tg://user?id=${user.id}">${escapeText(label)}</a>: ${count}
+        return `${index}. <b>${escapeText(label)}</b>: ${count}
 `;
     };
     const usersStatResult = await Promise.all(sorted.map((u, i) => userLineContent(u, i + 1)));
