@@ -212,8 +212,10 @@ export const doAction = async (msg, actionType) => {
             }
         };
         // delete duck cuz why logic
-        await BOT.deleteMessage(msg.chat.id, `${State.duckTimerStorage[msg.chat.id].duckMsgId}`);
-        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS()} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`, msg.message_id);
+        return Promise.all([
+            BOT.deleteMessage(msg.chat.id, `${State.duckTimerStorage[msg.chat.id].duckMsgId}`),
+            sendMsg(msg, `${MESSAGES[actionType].SUCCESS()} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`, msg.message_id)
+        ]);
     } else {
         await GroupUserDal.incrementType(msg, 'REJECT');
         State.userCooldown[msg.from.id] = dayjs().add(USER_MESSAGE_COOLDOWN, 's');
