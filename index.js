@@ -23,6 +23,7 @@ import { Events } from './services/Events.js';
         BOT.onText(/\/duckstats/, escCb(Stats.getUser));
         BOT.onText(/\/say ?(.+)?/, escCb(Feedback.send));
         BOT.onText(/\/groupstats/, escCb(Stats.getGroupStats));
+        BOT.onText(/\/jowa/, async (msg) => BOT.sendMessage(msg.chat.id, '(c)harot.'));
         // BOT.onText(/\/friyay/, escCb(Events.))
 
         BOT.onText(/\/reprep (.+)/, escCb(Feedback.replyReply));
