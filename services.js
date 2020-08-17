@@ -52,8 +52,9 @@ export const hasHunt = (ctx) => {
  *
  * @param {TgApi.Message} msg
  * @param {string} messageContent
+ * @param {number|null} replyId
  */
-export const sendMsg = async (msg, messageContent) => {
+export const sendMsg = async (msg, messageContent, replyId = null) => {
     const name = msg.from.first_name || msg.from.username;
     name
         .replace(/</g, '&lt;')
@@ -61,7 +62,17 @@ export const sendMsg = async (msg, messageContent) => {
         .replace(/&/g, '&amp;');
     const content = `(<a href="tg://user?id=${msg.from.id}">${name}</a>) ${messageContent}`;
 
-    await BOT.sendMessage(msg.chat.id, content, { parse_mode: 'HTML' });
+    /**
+     * @type {TgApi.SendMessageOptions} options
+     */
+    const options = {
+        parse_mode: 'HTML'
+    };
+    if (replyId) {
+        options.reply_to_message_id = replyId;
+    }
+
+    await BOT.sendMessage(msg.chat.id, content, options);
 };
 
 /**
@@ -106,8 +117,11 @@ export const scheduleDuckJob = async (chatId, date) => {
     State.jobschedules[chatId] = Schedule.scheduleJob(date, async () => {
         if (State.chatHasHunt[chatId]) {
             try {
-                await BOT.sendMessage(chatId, generateMessage(DUCK_WALK));
-                State.duckTimerStorage[chatId] = dayjs().toISOString();
+                const messageReturn = await BOT.sendMessage(chatId, generateMessage(DUCK_WALK));
+                State.duckTimerStorage[chatId] = {
+                    releaseTime: dayjs().toISOString(),
+                    duckMsgId: messageReturn.message_id
+                };
                 State.chatHasDuckOut[chatId] = true;
             } catch (e) {
                 await Exceptions.handle403(e, chatId);
@@ -184,7 +198,7 @@ export const doAction = async (msg, actionType) => {
 
     if (isSuccessAction(msg.from.id)) {
         scheduleNextDuck(msg);
-        const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id], 's', true);
+        const difference = dayjs().diff(State.duckTimerStorage[msg.chat.id].releaseTime, 's', true);
 
         const newVal = await GroupUserDal.incrementType(msg, actionType);
         const term = {
@@ -197,7 +211,9 @@ export const doAction = async (msg, actionType) => {
                 dbField: 'friends'
             }
         };
-        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS()} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`);
+        // delete duck cuz why logic
+        await BOT.deleteMessage(msg.chat.id, `${State.duckTimerStorage[msg.chat.id].duckMsgId}`);
+        return sendMsg(msg, `${MESSAGES[actionType].SUCCESS()} ${difference} seconds. You have ${term[actionType].term} ${newVal[term[actionType].dbField]} ducks.`, msg.message_id);
     } else {
         await GroupUserDal.incrementType(msg, 'REJECT');
         State.userCooldown[msg.from.id] = dayjs().add(USER_MESSAGE_COOLDOWN, 's');

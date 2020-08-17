@@ -1,3 +1,6 @@
+/**
+ * @type { {[key:string] : {releaseTime: string, duckMsgId: number }}}
+ */
 const duckTimerStorage = {};
 const chatHasDuckOut = {};
 const chatHasHunt = {};
