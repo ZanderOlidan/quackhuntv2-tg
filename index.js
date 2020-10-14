@@ -7,6 +7,7 @@ import { Feedback } from './services/FeedbackService.js';
 import { BootstrapServices } from './services/BootstrapServices.js';
 import { Migrations } from './services/MigrationServices.js';
 import { Events } from './services/Events.js';
+import { Roaster } from './services/Roast.js';
 
 (async () => {
     await dbInit();
@@ -43,6 +44,7 @@ import { Events } from './services/Events.js';
                 return BOT.sendMessage(msg.chat.id, `Quack quack your heart cracked 💔. ${msg.from.first_name} and ${msg.reply_to_message.from.first_name} is not a match. Next!`, { reply_to_message_id: msg.message_id });
             }
         });
+        BOT.onText(/\/roast/, escCb(Roaster.roast));
         // BOT.onText(/\/friyay/, escCb(Events.))
 
         BOT.onText(/\/reprep (.+)/, escCb(Feedback.replyReply));
