@@ -38,7 +38,8 @@ const initializeBot = async () => {
     setBot(bot);
     if (ENVIRONMENT === 'production') {
         await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`, {
-            certificate: `${SIGNED_CERT}`
+            certificate: `${SIGNED_CERT}`,
+            max_connections: 100
         });
     } else {
         await BOT.setWebHook(`${WEBHOOK_URL}/bot${t}`);
