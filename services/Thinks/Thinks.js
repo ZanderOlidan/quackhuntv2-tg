@@ -46,13 +46,22 @@ const sabihin = async (msg, match) => {
         await sendMsg(msg, 'Pssst. Can\'t sabi an empty message.');
         return;
     }
-    const message = escapeText(match[1]);
-    const msgSplit = message.split(' ').filter(n => n);
+
+    let text;
+    if (msg.reply_to_message && msg.reply_to_message.text) {
+        text = escapeText(msg.reply_to_message.text);
+    } else {
+        text = escapeText(match[1]);
+    }
+    const msgSplit = text.split(' ').filter(n => n);
+
     if (msgSplit.length > 25) {
         await sendMsg(msg, 'Message too mahaba. Cannot sabi.');
+        return;
     }
+    const finalMessage = msgSplit.join(' ');
 
-    await BOT.sendVoice(msg.chat.id, await getSabihin(message.join(' ')));
+    await BOT.sendVoice(msg.chat.id, await getSabihin(finalMessage));
 };
 
 export const Thinks = {
