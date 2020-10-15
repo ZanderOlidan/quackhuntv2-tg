@@ -2,11 +2,9 @@ import { tangibleSingularProperties, tangibleMultipleProperties, adjectives, adv
 
 const pluralPronouns = ['you', 'they'];
 
-const pronoun = term => pluralPronouns.includes(term.toLowerCase()) ? 'are' : 'is';
-
 const finalTemplates = [
-    name => `${name} ${pronoun(name)} ` + getDescriptor(),
-    name => `${name} ${pronoun(name)} ` + getAbstractProperty()
+    name => `${name} is ` + getDescriptor(),
+    name => `${name} has ` + getAbstractProperty()
 ];
 
 const templates = [
