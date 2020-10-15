@@ -46,6 +46,7 @@ import { Thinks } from './services/Thinks/Thinks.js';
         });
         BOT.onText(/\/roast/, escCb(Thinks.roast));
         BOT.onText(/\/bibethinks/, escCb(Thinks.giveCompliment));
+        BOT.onText(/\/sabihin/, escCb(Thinks.sabihin));
         // BOT.onText(/\/friyay/, escCb(Events.))
 
         BOT.onText(/\/reprep (.+)/, escCb(Feedback.replyReply));

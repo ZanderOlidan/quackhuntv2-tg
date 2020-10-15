@@ -1,7 +1,9 @@
 import * as TgApi from 'node-telegram-bot-api';
 import phin from 'phin';
+import { escapeText, sendMsg } from '../../services.js';
 import { BOT } from '../config.js';
 import { makeCompliment } from './Complimenter.js';
+import { getSabihin } from './Sabihin.js';
 
 /**
  *
@@ -35,7 +37,26 @@ const giveCompliment = async (msg) => {
     await BOT.sendMessage(msg.chat.id, compliment);
 };
 
+/**
+ *
+ * @param {TgApi.Message} msg
+ */
+const sabihin = async (msg, match) => {
+    if (match[0].split(' ').length === 1 && !msg.reply_to_message) {
+        await sendMsg(msg, 'Pssst. Can\'t sabi an empty message.');
+        return;
+    }
+    const message = escapeText(match[1]);
+    const msgSplit = message.split(' ').filter(n => n);
+    if (msgSplit.length > 25) {
+        await sendMsg(msg, 'Message too mahaba. Cannot sabi.');
+    }
+
+    await BOT.sendVoice(msg.chat.id, await getSabihin(message.join(' ')));
+};
+
 export const Thinks = {
     roast,
-    giveCompliment
+    giveCompliment,
+    sabihin
 };
