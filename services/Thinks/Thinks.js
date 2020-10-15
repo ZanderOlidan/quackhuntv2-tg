@@ -1,6 +1,7 @@
 import * as TgApi from 'node-telegram-bot-api';
 import phin from 'phin';
-import { BOT } from './config.js';
+import { BOT } from '../config.js';
+import { makeCompliment } from './Complimenter.js';
 
 /**
  *
@@ -21,6 +22,20 @@ const roast = async (msg) => {
     await BOT.sendMessage(msg.chat.id, insult);
 };
 
-export const Roaster = {
-    roast
+/**
+ *
+ * @param {TgApi.Message} msg
+ */
+const giveCompliment = async (msg) => {
+    let username = msg.from.first_name || msg.from.last_name;
+    if (msg.reply_to_message) {
+        username = msg.reply_to_message.from.first_name || msg.reply_to_message.from.last_name;
+    }
+    const compliment = makeCompliment(username);
+    await BOT.sendMessage(msg.chat.id, compliment);
+};
+
+export const Thinks = {
+    roast,
+    giveCompliment
 };
